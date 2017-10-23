@@ -14,6 +14,9 @@ class CBlockHeader;
 class CBlockIndex;
 class uint256;
 
+int64_t GetTargetSpacing();
+int64_t GetInterval(const Consensus::Params& params);
+
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params&);
 unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params&);
 

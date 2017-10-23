@@ -76,12 +76,12 @@ public:
         consensus.BIP65Height = 918684; // bab3041e8977e0dc3eeff63fe707b92bde1dd449d8efafb248c27c8264cc311a
         consensus.BIP66Height = 811879; // 7aceee012833fa8952f8835d8b1b3ae233cd6ab08fdb27a771d2bd7bdc491894
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
-        consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // 3.5 days
+        consensus.nPowTargetTimespan = 1 * 60 * 60; // KittehCoin: retarget every 1 hours
         consensus.nPowTargetSpacing = 2.5 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 6048; // 75% of 8064
-        consensus.nMinerConfirmationWindow = 8064; // nPowTargetTimespan / nPowTargetSpacing * 4
+        consensus.nMinerConfirmationWindow = 8064; // Lynx: FIXME: Lynx Reomve // nPowTargetTimespan / nPowTargetSpacing * 4
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
@@ -120,10 +120,11 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinpool.com", "dnsseed.kittehcoinpool.com"));
+        vSeeds.push_back(CDNSSeedData("172.17.0.129", "172.17.0.129"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinpool.com", "dnsseed.kittehcoinpool.com"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);

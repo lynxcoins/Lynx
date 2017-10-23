@@ -45,4 +45,7 @@ static const int SHORT_IDS_BLOCKS_VERSION = 70014;
 //! not banning for invalid compact blocks starts with this version
 static const int INVALID_CB_NO_BAN_VERSION = 70015;
 
+// Block number at which the hard fork will be performed
+static const int HARDFORK_HEIGHT_1 = 126250;
+
 #endif // BITCOIN_VERSION_H
