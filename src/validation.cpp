@@ -3112,17 +3112,32 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     // Reject outdated version blocks when 95% (75% on testnet) of the network has upgraded:
     // check for version 2, 3 and 4 upgrades
-    if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
-       (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
-       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
-            return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
-                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
+// TODO: requires additional research
+//    if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
+//       (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
+//       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
+//            return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
+//                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
     if (block.nVersion < VERSIONBITS_TOP_BITS && IsWitnessEnabled(pindexPrev, consensusParams))
         return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
                                  strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
     return true;
+}
+
+static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
+{
+    // KittehCoin: temporarily disable v2 block lockin until we are ready for v2 transition
+    // return false; SFS commented out
+    unsigned int nFound = 0;
+    for (unsigned int i = 0; i < nToCheck && nFound < nRequired && pstart != NULL; i++)
+    {
+        if (pstart->nVersion >= minVersion)
+            ++nFound;
+        pstart = pstart->pprev;
+    }
+    return (nFound >= nRequired);
 }
 
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev)
@@ -3147,12 +3162,18 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, const Co
     }
 
     // Enforce rule that the coinbase starts with serialized block height
-    if (nHeight >= consensusParams.BIP34Height)
+    if (block.nVersion >= 2)
     {
-        CScript expect = CScript() << nHeight;
-        if (block.vtx[0]->vin[0].scriptSig.size() < expect.size() ||
-            !std::equal(expect.begin(), expect.end(), block.vtx[0]->vin[0].scriptSig.begin())) {
-            return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+        bool isTestNet = GetBoolArg("-testnet", false);
+        // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
+        if ((!isTestNet && IsSuperMajority(2, pindexPrev, 750, 1000)) ||
+            (isTestNet && IsSuperMajority(2, pindexPrev, 51, 100)))
+        {
+            CScript expect = CScript() << nHeight;
+            if (block.vtx[0]->vin[0].scriptSig.size() < expect.size() ||
+                !std::equal(expect.begin(), expect.end(), block.vtx[0]->vin[0].scriptSig.begin())) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+            }
         }
     }
 

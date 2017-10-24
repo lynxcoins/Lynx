@@ -143,7 +143,8 @@ static unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBloc
         if (i == 1) {
             PastDifficultyAverage.SetCompact(BlockReading->nBits);
         } else {
-            const arith_uint256& BlockReadingDiffculty = arith_uint256().SetCompact(BlockReading->nBits);
+            arith_uint256 BlockReadingDiffculty;
+            BlockReadingDiffculty.SetCompact(BlockReading->nBits);
             if (BlockReadingDiffculty > PastDifficultyAveragePrev)
                 PastDifficultyAverage = PastDifficultyAveragePrev + (BlockReadingDiffculty - PastDifficultyAveragePrev) / i;
             else
