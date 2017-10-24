@@ -38,6 +38,7 @@
 
 #include <atomic>
 #include <sstream>
+#include <random>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -1163,16 +1164,135 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     return true;
 }
 
-CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
+static int generateMTRandom(unsigned int s, int range)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
+    std::mt19937 gen(s);
+    std::uniform_int_distribution<> dist(1, range);
+    return dist(gen);
+}
 
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
+CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
+{
+    int64_t nSubsidy = 1000 * COIN;
+
+    std::string cseed_str = prevHash.ToString().substr(7,7);
+    const char* cseed = cseed_str.c_str();
+    long seed = hex2long(cseed);
+    int rand = generateMTRandom(seed, 99999);
+
+    int rand1 = 0;
+    int rand2 = 0;
+    int rand3 = 0;
+    int rand4 = 0;
+    int rand5 = 0;
+
+    //start with the old kittehcoin schedule, the block rewards remain the same until we hit the hardfork
+    int height1 = 200000;
+    int height2 = 400000;
+    int height3 = 600000;
+    int height4 = 800000;
+    int height5 = 1000000;
+    int height6 = 1200000;
+
+    if(nHeight <= HARDFORK_HEIGHT_1)
+    {
+
+        if(nHeight < height1)
+        {
+                nSubsidy = (1 + rand) * COIN > nSubsidy ? (1 + rand) * COIN : nSubsidy;
+        }
+        else if(nHeight < height2)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand1 = generateMTRandom(seed, 49999);
+                nSubsidy = (1 + rand1) * COIN > nSubsidy ? (1 + rand1) * COIN : nSubsidy;
+        }
+        else if(nHeight < height3)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand2 = generateMTRandom(seed, 24999);
+                nSubsidy = (1 + rand2) * COIN > nSubsidy ? (1 + rand2) * COIN : nSubsidy;
+        }
+        else if(nHeight < height4)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand3 = generateMTRandom(seed, 12499);
+                nSubsidy = (1 + rand3) * COIN > nSubsidy ? (1 + rand3) * COIN : nSubsidy;
+        }
+        else if(nHeight < height5)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand4 = generateMTRandom(seed, 6249);
+                nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
+        }
+        else if(nHeight < height6)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand5 = generateMTRandom(seed, 3124);
+                nSubsidy = (1 + rand5) * COIN > nSubsidy ? (1 + rand5) * COIN : nSubsidy;
+        }
+
+    }
+    else if(nHeight > HARDFORK_HEIGHT_1)
+    {
+        rand = generateMTRandom(seed, 49999);
+
+        //new hard forked coin specs, different payout schedule
+        height1 = 200000;
+        height2 = 400000;
+        height3 = 500000;
+        height4 = 600000;
+        height5 = 700000;
+
+        if(nHeight < height1)
+        {
+                nSubsidy = (1 + rand) * COIN > nSubsidy ? (1 + rand) * COIN : nSubsidy;
+        }
+        else if(nHeight < height2)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand1 = generateMTRandom(seed, 24999);
+                nSubsidy = (1 + rand1) * COIN > nSubsidy ? (1 + rand1) * COIN : nSubsidy;
+        }
+        else if(nHeight < height3)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand2 = generateMTRandom(seed, 12499);
+                nSubsidy = (1 + rand2) * COIN > nSubsidy ? (1 + rand2) * COIN : nSubsidy;
+        }
+        else if(nHeight < height4)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand3 = generateMTRandom(seed, 6249);
+                nSubsidy = (1 + rand3) * COIN > nSubsidy ? (1 + rand3) * COIN : nSubsidy;
+        }
+        else if(nHeight < height5)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand4 = generateMTRandom(seed, 3124);
+                nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
+        }
+        else nSubsidy = 2000 * COIN;
+    }
+
     return nSubsidy;
 }
 
@@ -1929,7 +2049,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime3 - nTime2), 0.001 * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * 0.000001);
 
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, hashPrevBlock);
     if (block.vtx[0]->GetValueOut() > blockReward)
         return state.DoS(100,
                          error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",

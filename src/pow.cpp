@@ -115,9 +115,9 @@ static unsigned int GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const 
 }
 
 static unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader *pblock, uint64_t TargetBlocksSpacingSeconds, uint64_t PastBlocksMin, uint64_t PastBlocksMax,
-		const Consensus::Params& params) {
+    const Consensus::Params& params) {
 
-	const arith_uint256 bnProofOfWorkLimit = UintToArith256(params.powLimit);
+    const arith_uint256 bnProofOfWorkLimit = UintToArith256(params.powLimit);
 
     /* current difficulty formula, megacoin - kimoto gravity well */
     const CBlockIndex  *BlockLastSolved             = pindexLast;
@@ -140,8 +140,15 @@ static unsigned int KimotoGravityWell(const CBlockIndex* pindexLast, const CBloc
         if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
         PastBlocksMass++;
 
-        if (i == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
-        else        { PastDifficultyAverage = ((arith_uint256().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / i) + PastDifficultyAveragePrev; }
+        if (i == 1) {
+            PastDifficultyAverage.SetCompact(BlockReading->nBits);
+        } else {
+            const arith_uint256& BlockReadingDiffculty = arith_uint256().SetCompact(BlockReading->nBits);
+            if (BlockReadingDiffculty > PastDifficultyAveragePrev)
+                PastDifficultyAverage = PastDifficultyAveragePrev + (BlockReadingDiffculty - PastDifficultyAveragePrev) / i;
+            else
+                PastDifficultyAverage = PastDifficultyAveragePrev - (PastDifficultyAveragePrev - BlockReadingDiffculty) / i;
+        }
         PastDifficultyAveragePrev = PastDifficultyAverage;
 
         PastRateActualSeconds           = BlockLastSolved->GetBlockTime() - BlockReading->GetBlockTime();
