@@ -21,15 +21,15 @@ static bool isTestnet()
     return GetBoolArg("-testnet", false);
 }
 
-int64_t GetTargetSpacing()
+static int64_t GetTargetSpacing(const Consensus::Params& params)
 {
     int nBestHeight = chainActive.Height();
-    return nBestHeight <= HARDFORK_HEIGHT_1 && !isTestnet() ? 30 : 60;
+    return params.GetPowTargetSpacing(nBestHeight);
 }
 
-int64_t GetInterval(const Consensus::Params& params)
+static int64_t GetInterval(const Consensus::Params& params)
 {
-    int64_t nInterval = params.nPowTargetTimespan / GetTargetSpacing();
+    int64_t nInterval = params.nPowTargetTimespan / GetTargetSpacing(params);
     return nInterval;
 }
 
@@ -50,7 +50,7 @@ static unsigned int GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const 
         {
             // If the new block's timestamp is more than 2*GetTargetSpacing() minutes
             // then allow mining of a min-difficulty block.
-            if (pblock->nTime > pindexLast->nTime + GetTargetSpacing()*2)
+            if (pblock->nTime > pindexLast->nTime + GetTargetSpacing(params)*2)
                 return nProofOfWorkLimit;
             else
             {

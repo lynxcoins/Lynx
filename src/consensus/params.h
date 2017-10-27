@@ -7,6 +7,7 @@
 #define BITCOIN_CONSENSUS_PARAMS_H
 
 #include "uint256.h"
+#include "version.h"
 #include <map>
 #include <string>
 
@@ -52,15 +53,17 @@ struct Params {
      * Examples: 1916 for 95%, 1512 for testchains.
      */
     uint32_t nRuleChangeActivationThreshold;
-    uint32_t nMinerConfirmationWindow; // Lynx: FIXME: replace by GetInterval
+    uint32_t nMinerConfirmationWindow;
     BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
     /** Proof of work parameters */
     uint256 powLimit;
     bool fPowAllowMinDifficultyBlocks;
     bool fPowNoRetargeting;
-    int64_t nPowTargetSpacing; // Lynx: FIXME: replace by GetTargetSpacing
+    int64_t nPowTargetSpacingV1;
+    int64_t nPowTargetSpacingV2;
+    int64_t GetPowTargetSpacing(int nHeight) const { return nHeight <= HARDFORK_HEIGHT_1 ? nPowTargetSpacingV1 : nPowTargetSpacingV2; }
     int64_t nPowTargetTimespan;
-    int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
+    int64_t DifficultyAdjustmentInterval(int nHeight) const { return nPowTargetTimespan / GetPowTargetSpacing(nHeight); }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
 };
