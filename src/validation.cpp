@@ -489,6 +489,17 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
 
 
 
+static CAmount GetCurrentMaxMoney()
+{
+    if (chainActive.Height() <= HARDFORK_HEIGHT_1)
+        return 50000000000 * COIN;
+    return MAX_MONEY;
+}
+
+static bool CurrentMoneyRange(const CAmount& nValue)
+{
+    return (nValue >= 0 && nValue <= GetCurrentMaxMoney());
+}
 
 bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs)
 {
@@ -507,10 +518,10 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     {
         if (txout.nValue < 0)
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-negative");
-        if (txout.nValue > MAX_MONEY)
+        if (txout.nValue > GetCurrentMaxMoney())
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-toolarge");
         nValueOut += txout.nValue;
-        if (!MoneyRange(nValueOut))
+        if (!CurrentMoneyRange(nValueOut))
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-txouttotal-toolarge");
     }
 
@@ -2052,9 +2063,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, hashPrevBlock);
     if (block.vtx[0]->GetValueOut() > blockReward)
         return state.DoS(100,
-                         error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
-                               block.vtx[0]->GetValueOut(), blockReward),
-                               REJECT_INVALID, "bad-cb-amount");
+                     error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
+                           block.vtx[0]->GetValueOut(), blockReward),
+                           REJECT_INVALID, "bad-cb-amount");
 
     if (!control.Wait())
         return state.DoS(100, false);
