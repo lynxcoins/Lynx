@@ -1254,7 +1254,7 @@ CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
         }
 
     }
-    else if(nHeight > HARDFORK_HEIGHT_1)
+    else if(nHeight > HARDFORK_HEIGHT_1 && nHeight <= HARDFORK_HEIGHT_2)
     {
         rand = generateMTRandom(seed, 49999);
 
@@ -1302,7 +1302,8 @@ CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
                 nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
         }
         else nSubsidy = 2000 * COIN;
-    }
+    } else if (nHeight > HARDFORK_HEIGHT_2)
+        nSubsidy = 100 * COIN;
 
     return nSubsidy;
 }
@@ -2063,13 +2064,16 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, hashPrevBlock);
     if (block.vtx[0]->GetValueOut() > blockReward) {
         std::string BlockHash = pindex->GetBlockHash().ToString();
+        bool isTestnet = GetBoolArg("-testnet", false);
+        if (isTestnet || pindex->nHeight > HARDFORK_HEIGHT_2)
+            return state.DoS(100,
+                error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
+                    block.vtx[0]->GetValueOut(), blockReward),
+                    REJECT_INVALID, "bad-cb-amount");
+
         LogPrintf("LynxWarning: Block (height=%d, hash=%s, fees=%d, txCount=%d): coinbase pays too much (actual=%d vs limit=%d)\n",
                 pindex->nHeight, BlockHash.c_str(), nFees, block.vtx.size(),
                 block.vtx[0]->GetValueOut(), blockReward);
-//        return state.DoS(100,
-//                         error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
-//                               block.vtx[0]->GetValueOut(), blockReward),
-//                               REJECT_INVALID, "bad-cb-amount");
     } else if (block.vtx[0]->GetValueOut() < blockReward) {
         std::string BlockHash = pindex->GetBlockHash().ToString();
         LogPrintf("LynxInfo: Block (height=%d, hash=%s, fees=%d, txCount=%d): coinbase pays less than estimated (actual=%d vs limit=%d)\n",
