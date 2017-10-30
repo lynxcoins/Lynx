@@ -59,9 +59,7 @@ struct Params {
     uint256 powLimit;
     bool fPowAllowMinDifficultyBlocks;
     bool fPowNoRetargeting;
-    int64_t nPowTargetSpacingV1;
-    int64_t nPowTargetSpacingV2;
-    int64_t GetPowTargetSpacing(int nHeight) const { return nHeight <= HARDFORK_HEIGHT_1 ? nPowTargetSpacingV1 : nPowTargetSpacingV2; }
+    int64_t (*GetPowTargetSpacing)(int nHeight);
     int64_t nPowTargetTimespan;
     int64_t DifficultyAdjustmentInterval(int nHeight) const { return nPowTargetTimespan / GetPowTargetSpacing(nHeight); }
     uint256 nMinimumChainWork;
