@@ -171,8 +171,8 @@ public:
         consensus.BIP34Hash = uint256S("8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573");
         consensus.BIP65Height = 76; // 8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573
         consensus.BIP66Height = 76; // 8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573
-        consensus.PowTargetSpacingV1 = 100;
-        consensus.PowTargetSpacingV1 = 200;
+        consensus.HardForkHeight = 100;
+        consensus.HardFork2Height = 200;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 1 * 60 * 60; // // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 60;
