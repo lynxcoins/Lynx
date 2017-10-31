@@ -489,18 +489,6 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
 
 
 
-static CAmount GetCurrentMaxMoney()
-{
-    if (chainActive.Height() <= HARDFORK_HEIGHT_1)
-        return 50000000000 * COIN;
-    return MAX_MONEY;
-}
-
-static bool CurrentMoneyRange(const CAmount& nValue)
-{
-    return (nValue >= 0 && nValue <= GetCurrentMaxMoney());
-}
-
 bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs)
 {
     // Basic checks that don't depend on any context
@@ -518,10 +506,10 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     {
         if (txout.nValue < 0)
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-negative");
-        if (txout.nValue > GetCurrentMaxMoney())
+        if (txout.nValue > MAX_MONEY)
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-toolarge");
         nValueOut += txout.nValue;
-        if (!CurrentMoneyRange(nValueOut))
+        if (!MoneyRange(nValueOut))
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-txouttotal-toolarge");
     }
 
@@ -1182,7 +1170,7 @@ static int generateMTRandom(unsigned int s, int range)
     return dist(gen);
 }
 
-CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
+CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& params, const uint256& prevHash)
 {
     int64_t nSubsidy = 1000 * COIN;
 
@@ -1205,7 +1193,7 @@ CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
     int height5 = 1000000;
     int height6 = 1200000;
 
-    if(nHeight <= HARDFORK_HEIGHT_1)
+    if(nHeight <=  params.HardForkHeight)
     {
 
         if(nHeight < height1)
@@ -1252,9 +1240,8 @@ CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
                 rand5 = generateMTRandom(seed, 3124);
                 nSubsidy = (1 + rand5) * COIN > nSubsidy ? (1 + rand5) * COIN : nSubsidy;
         }
-
     }
-    else if(nHeight > HARDFORK_HEIGHT_1 && nHeight <= HARDFORK_HEIGHT_2)
+    else if(nHeight <= params.HardFork2Height)
     {
         rand = generateMTRandom(seed, 49999);
 
@@ -1302,8 +1289,7 @@ CAmount GetBlockSubsidy(int nHeight, const uint256& prevHash)
                 nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
         }
         else nSubsidy = 2000 * COIN;
-    } else if (nHeight > HARDFORK_HEIGHT_2)
-        nSubsidy = 100 * COIN;
+    } else nSubsidy = 100 * COIN;
 
     return nSubsidy;
 }
@@ -2061,11 +2047,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime3 - nTime2), 0.001 * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * 0.000001);
 
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, hashPrevBlock);
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus(), hashPrevBlock);
     if (block.vtx[0]->GetValueOut() > blockReward) {
         std::string BlockHash = pindex->GetBlockHash().ToString();
-        bool isTestnet = GetBoolArg("-testnet", false);
-        if (isTestnet || pindex->nHeight > HARDFORK_HEIGHT_2)
+        if (pindex->nHeight > chainparams.GetConsensus().HardFork2Height)
             return state.DoS(100,
                 error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                     block.vtx[0]->GetValueOut(), blockReward),

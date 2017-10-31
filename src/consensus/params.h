@@ -47,6 +47,10 @@ struct Params {
     int BIP65Height;
     /** Block height at which BIP66 becomes active */
     int BIP66Height;
+    /** Block number at which the hard fork will be performed */
+    int HardForkHeight;
+    /** Block number at which the second hard fork will be performed */
+    int HardFork2Height;
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
@@ -59,7 +63,16 @@ struct Params {
     uint256 powLimit;
     bool fPowAllowMinDifficultyBlocks;
     bool fPowNoRetargeting;
-    int64_t (*GetPowTargetSpacing)(int nHeight);
+    int64_t PowTargetSpacingV1;
+    int64_t PowTargetSpacingV2;
+    int64_t PowTargetSpacingV3;
+    int64_t GetPowTargetSpacing(int nHeight) const {
+        if (nHeight <= HardForkHeight)
+            return PowTargetSpacingV1;
+        if (nHeight <= HardFork2Height)
+            return PowTargetSpacingV2;
+        return PowTargetSpacingV3;
+    }
     int64_t nPowTargetTimespan;
     int64_t DifficultyAdjustmentInterval(int nHeight) const { return nPowTargetTimespan / GetPowTargetSpacing(nHeight); }
     uint256 nMinimumChainWork;

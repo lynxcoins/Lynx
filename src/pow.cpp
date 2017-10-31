@@ -191,8 +191,9 @@ static unsigned int GetNextWorkRequired_V2(const CBlockIndex* pindexLast, const 
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-    if(pindexLast->nHeight <= HARDFORK_HEIGHT_1 && !GetBoolArg("-testnet", false) && !GetBoolArg("-usekgw", false)) return GetNextWorkRequired_V1(pindexLast, pblock, params);
-    else return GetNextWorkRequired_V2(pindexLast, pblock, params);
+    if(pindexLast->nHeight <= params.HardForkHeight)
+        return GetNextWorkRequired_V1(pindexLast, pblock, params);
+    return GetNextWorkRequired_V2(pindexLast, pblock, params);
 }
 
 unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
