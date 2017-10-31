@@ -189,11 +189,57 @@ static unsigned int GetNextWorkRequired_V2(const CBlockIndex* pindexLast, const 
     return KimotoGravityWell(pindexLast, pblock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax, params);
 }
 
+static unsigned int GetNextWorkRequired_Litecoin(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+{
+    assert(pindexLast != nullptr);
+    unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
+
+    // Only change once per difficulty adjustment interval
+    if ((pindexLast->nHeight+1) % params.DifficultyAdjustmentInterval(pindexLast->nHeight+1) != 0)
+    {
+        if (params.fPowAllowMinDifficultyBlocks)
+        {
+            // Special difficulty rule for testnet:
+            // If the new block's timestamp is more than 2* 10 minutes
+            // then allow mining of a min-difficulty block.
+            if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.GetPowTargetSpacing(pindexLast->nHeight+1)*2)
+                return nProofOfWorkLimit;
+            else
+            {
+                // Return the last non-special-min-difficulty-rules-block
+                const CBlockIndex* pindex = pindexLast;
+                while (pindex->pprev && pindex->nHeight % params.DifficultyAdjustmentInterval(pindexLast->nHeight+1) != 0 && pindex->nBits == nProofOfWorkLimit)
+                    pindex = pindex->pprev;
+                return pindex->nBits;
+            }
+        }
+        return pindexLast->nBits;
+    }
+
+    // Go back by what we want to be 14 days worth of blocks
+    // Litecoin: This fixes an issue where a 51% attack can change difficulty at will.
+    // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+    int blockstogoback = params.DifficultyAdjustmentInterval(pindexLast->nHeight+1)-1;
+    if ((pindexLast->nHeight+1) != params.DifficultyAdjustmentInterval(pindexLast->nHeight+1))
+        blockstogoback = params.DifficultyAdjustmentInterval(pindexLast->nHeight+1);
+
+    // Go back by what we want to be 14 days worth of blocks
+    const CBlockIndex* pindexFirst = pindexLast;
+    for (int i = 0; pindexFirst && i < blockstogoback; i++)
+        pindexFirst = pindexFirst->pprev;
+
+    assert(pindexFirst);
+
+    return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
+}
+
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     if(pindexLast->nHeight <= params.HardForkHeight)
         return GetNextWorkRequired_V1(pindexLast, pblock, params);
-    return GetNextWorkRequired_V2(pindexLast, pblock, params);
+    if(pindexLast->nHeight <= params.HardFork2Height)
+        return GetNextWorkRequired_V2(pindexLast, pblock, params);
+    return GetNextWorkRequired_Litecoin(pindexLast, pblock, params);
 }
 
 unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
