@@ -103,8 +103,8 @@ namespace boost {
 
 using namespace std;
 
-const char * const BITCOIN_CONF_FILENAME = "litecoin.conf";
-const char * const BITCOIN_PID_FILENAME = "litecoin.pid";
+const char * const BITCOIN_CONF_FILENAME = "lynx.conf";
+const char * const BITCOIN_PID_FILENAME = "lynx.pid";
 
 CCriticalSection cs_args;
 map<string, string> mapArgs;
