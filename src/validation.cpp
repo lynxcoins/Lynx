@@ -1311,10 +1311,10 @@ bool IsInitialBlockDownload()
         return true;
     if (chainActive.Tip() == NULL)
         return true;
-    if (chainActive.Tip()->nChainWork < UintToArith256(chainParams.GetConsensus().nMinimumChainWork))
-        return true;
-    if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
-        return true;
+     if (chainActive.Tip()->nChainWork < UintToArith256(chainParams.GetConsensus().nMinimumChainWork))
+         return true;
+     if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+         return true;
     latchToFalse.store(true, std::memory_order_relaxed);
     return false;
 }
@@ -2059,11 +2059,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         LogPrintf("LynxWarning: Block (height=%d, hash=%s, fees=%d, txCount=%d): coinbase pays too much (actual=%d vs limit=%d)\n",
                 pindex->nHeight, BlockHash.c_str(), nFees, block.vtx.size(),
                 block.vtx[0]->GetValueOut(), blockReward);
-    } else if (block.vtx[0]->GetValueOut() < blockReward) {
-        std::string BlockHash = pindex->GetBlockHash().ToString();
-        LogPrintf("LynxInfo: Block (height=%d, hash=%s, fees=%d, txCount=%d): coinbase pays less than estimated (actual=%d vs limit=%d)\n",
-                pindex->nHeight, BlockHash.c_str(), nFees, block.vtx.size(),
-                block.vtx[0]->GetValueOut(), blockReward);        
     }
 
     if (!control.Wait())
