@@ -40,9 +40,9 @@ QString BitcoinUnits::name(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("MEOW");
-    case mBTC: return QString("mMEOW");
-    case uBTC: return QString::fromUtf8("μMEOW");
+    case BTC: return QString("LYNX");
+    case mBTC: return QString("mLYNX");
+    case uBTC: return QString::fromUtf8("μLYNX");
     default: return QString("???");
     }
 }
@@ -51,9 +51,9 @@ QString BitcoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("KittehCoin");
-    case mBTC: return QString("Milli-KittehCoin (1 / 1" THIN_SP_UTF8 "000)");
-    case uBTC: return QString("Micro-KittehCoin (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+    case BTC: return QString("LynxCoin");
+    case mBTC: return QString("Milli-LynxCoin (1 / 1" THIN_SP_UTF8 "000)");
+    case uBTC: return QString("Micro-LynxCoin (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
     default: return QString("???");
     }
 }
