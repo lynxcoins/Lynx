@@ -1254,7 +1254,9 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             return false;
         }
 
-        if (nVersion < MIN_PEER_PROTO_VERSION)
+        auto& consensus = chainparams.GetConsensus();
+        const int MinVersion = (chainActive.Height() >= consensus.HardFork2Height) ? MIN_PEER_PROTO_VERSION : MIN_PEER_PROTO_VERSION_BEFOR_HARD_FORK2;
+        if (nVersion < MinVersion)
         {
             // disconnect from peers older than this proto version
             LogPrintf("peer=%d using obsolete version %i; disconnecting\n", pfrom->id, nVersion);
