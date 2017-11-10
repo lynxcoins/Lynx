@@ -31,6 +31,7 @@
 #include "validationinterface.h"
 
 #include <boost/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #if defined(NDEBUG)
 # error "Litecoin cannot be compiled without assertions."
@@ -1166,6 +1167,15 @@ inline void static SendBlockTransactions(const CBlock& block, const BlockTransac
     connman.PushMessage(pfrom, msgMaker.Make(nSendFlags, NetMsgType::BLOCKTXN, resp));
 }
 
+const auto BanOldCliendDateTime = boost::posix_time::from_iso_string("20171224T213000Z");
+bool static GetMinPeerProtoVer(const CChainParams&)
+{
+    int ret = MIN_PEER_PROTO_VERSION;
+    if (boost::posix_time::second_clock::universal_time() < BanOldCliendDateTime)
+        ret = MIN_PEER_PROTO_VERSION_BEFOR_HARD_FORK2;
+    return ret;
+}
+
 bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman& connman, const std::atomic<bool>& interruptMsgProc)
 {
     LogPrint("net", "received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
@@ -1254,9 +1264,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             return false;
         }
 
-        auto& consensus = chainparams.GetConsensus();
-        const int MinVersion = (chainActive.Height() >= consensus.HardFork2Height) ? MIN_PEER_PROTO_VERSION : MIN_PEER_PROTO_VERSION_BEFOR_HARD_FORK2;
-        if (nVersion < MinVersion)
+        if (nVersion < GetMinPeerProtoVer(chainparams))
         {
             // disconnect from peers older than this proto version
             LogPrintf("peer=%d using obsolete version %i; disconnecting\n", pfrom->id, nVersion);
