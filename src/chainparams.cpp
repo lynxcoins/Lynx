@@ -124,10 +124,19 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
-        vSeeds.push_back(CDNSSeedData("kittehcoinpool.com", "dnsseed.kittehcoinpool.com"));
+        vSeeds.push_back(CDNSSeedData("seed01.kittehcoin.io", "seed01.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed02.kittehcoin.io", "seed02.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed03.kittehcoin.io", "seed03.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed04.kittehcoin.io", "seed04.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed05.kittehcoin.io", "seed05.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed06.kittehcoin.io", "seed06.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed07.kittehcoin.io", "seed07.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed08.kittehcoin.io", "seed08.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed09.kittehcoin.io", "seed09.kittehcoin.io"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
+        // vSeeds.push_back(CDNSSeedData("kittehcoinpool.com", "dnsseed.kittehcoinpool.com"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);
