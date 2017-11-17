@@ -124,15 +124,15 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.push_back(CDNSSeedData("seed01.kittehcoin.io", "seed01.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed02.kittehcoin.io", "seed02.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed03.kittehcoin.io", "seed03.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed04.kittehcoin.io", "seed04.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed05.kittehcoin.io", "seed05.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed06.kittehcoin.io", "seed06.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed07.kittehcoin.io", "seed07.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed08.kittehcoin.io", "seed08.kittehcoin.io"));
-        vSeeds.push_back(CDNSSeedData("seed09.kittehcoin.io", "seed09.kittehcoin.io"));
+        vSeeds.push_back(CDNSSeedData("seed01.getlynx.io", "seed01.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed02.getlynx.io", "seed02.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed03.getlynx.io", "seed03.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed04.getlynx.io", "seed04.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed05.getlynx.io", "seed05.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed06.getlynx.io", "seed06.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed07.getlynx.io", "seed07.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed08.getlynx.io", "seed08.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed09.getlynx.io", "seed09.getlynx.io"));
         // vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
         // vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
         // vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
