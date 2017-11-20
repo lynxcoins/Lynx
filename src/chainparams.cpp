@@ -124,6 +124,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
+        vSeeds.push_back(CDNSSeedData("seed00.getlynx.io", "seed00.getlynx.io"));
         vSeeds.push_back(CDNSSeedData("seed01.getlynx.io", "seed01.getlynx.io"));
         vSeeds.push_back(CDNSSeedData("seed02.getlynx.io", "seed02.getlynx.io"));
         vSeeds.push_back(CDNSSeedData("seed03.getlynx.io", "seed03.getlynx.io"));
