@@ -134,6 +134,10 @@ public:
         vSeeds.push_back(CDNSSeedData("seed07.getlynx.io", "seed07.getlynx.io"));
         vSeeds.push_back(CDNSSeedData("seed08.getlynx.io", "seed08.getlynx.io"));
         vSeeds.push_back(CDNSSeedData("seed09.getlynx.io", "seed09.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed10.getlynx.io", "seed10.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed11.getlynx.io", "seed11.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed12.getlynx.io", "seed12.getlynx.io"));
+        vSeeds.push_back(CDNSSeedData("seed13.getlynx.io", "seed13.getlynx.io"));
         // vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
         // vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
         // vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
