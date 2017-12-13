@@ -47,14 +47,14 @@
 #endif
 
 const int BITCOIN_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
-const QString BITCOIN_IPC_PREFIX("litecoin:");
+const QString BITCOIN_IPC_PREFIX("lynx:");
 // BIP70 payment protocol messages
 const char* BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
 const char* BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
 // BIP71 payment protocol media types
-const char* BIP71_MIMETYPE_PAYMENT = "application/litecoin-payment";
-const char* BIP71_MIMETYPE_PAYMENTACK = "application/litecoin-paymentack";
-const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/litecoin-paymentrequest";
+const char* BIP71_MIMETYPE_PAYMENT = "application/lynx-payment";
+const char* BIP71_MIMETYPE_PAYMENTACK = "application/lynx-paymentack";
+const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/lynx-paymentrequest";
 
 struct X509StoreDeleter {
       void operator()(X509_STORE* b) {
@@ -78,7 +78,7 @@ namespace // Anon namespace
 //
 static QString ipcServerName()
 {
-    QString name("LitecoinQt");
+    QString name("LynxQt");
 
     // Append a simple hash of the datadir
     // Note that GetDataDir(true) returns a different path

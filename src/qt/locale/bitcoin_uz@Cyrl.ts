@@ -235,7 +235,7 @@
     </message>
     <message>
         <source>Open a lynx: URI or payment request</source>
-        <translation>Litecoin’ни очиш: URI ёки тўлов сўрови</translation>
+        <translation>Lynx’ни очиш: URI ёки тўлов сўрови</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

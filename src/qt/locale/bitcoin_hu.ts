@@ -1533,7 +1533,7 @@
     </message>
     <message>
         <source>Insufficient funds</source>
-        <translation>Nincs elég litecoinod.</translation>
+        <translation>Nincs elég lynxod.</translation>
     </message>
     <message>
         <source>Loading block index...</source>
