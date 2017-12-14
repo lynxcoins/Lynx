@@ -8,6 +8,7 @@
 
 #include "uint256.h"
 #include "version.h"
+#include "consensus.h"
 #include <map>
 #include <string>
 
@@ -72,6 +73,11 @@ struct Params {
         if (nHeight <= HardFork2Height)
             return PowTargetSpacingV2;
         return PowTargetSpacingV3;
+    }
+    int GetCoinbaseMaturity(int nHeight) const {
+        if  (nHeight <= HardFork2Height)
+            return COINBASE_MATURITY;
+        return COINBASE_MATURITY2;
     }
     int64_t nPowTargetTimespan;
     int64_t DifficultyAdjustmentInterval(int nHeight) const { return nPowTargetTimespan / GetPowTargetSpacing(nHeight); }
