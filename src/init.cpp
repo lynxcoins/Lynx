@@ -509,7 +509,7 @@ std::string LicenseInfo()
     const std::string URL_SOURCE_CODE = "<https://github.com/doh9Xiet7weesh9va9th/lynx>";
     const std::string URL_WEBSITE = "<https://getlynx.io>";
 
-    return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2011, COPYRIGHT_YEAR) + " ") + "\n" +
+    return CopyrightHolders("Copyright (C) ") + "\n" +
            "\n" +
            strprintf(_("Please contribute if you find %s useful. "
                        "Visit %s for further information about the software."),
