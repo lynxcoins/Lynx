@@ -1168,7 +1168,7 @@ inline void static SendBlockTransactions(const CBlock& block, const BlockTransac
 }
 
 const auto BanOldCliendDateTime = boost::posix_time::from_iso_string("20171224T213000Z");
-bool static GetMinPeerProtoVer(const CChainParams&)
+int static GetMinPeerProtoVer(const CChainParams&)
 {
     int ret = MIN_PEER_PROTO_VERSION;
     if (boost::posix_time::second_clock::universal_time() < BanOldCliendDateTime)
