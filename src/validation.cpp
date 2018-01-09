@@ -38,6 +38,7 @@
 
 #include <atomic>
 #include <sstream>
+#include <random>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -88,7 +89,7 @@ static void CheckBlockIndex(const Consensus::Params& consensusParams);
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
 
-const std::string strMessageMagic = "Litecoin Signed Message:\n";
+const std::string strMessageMagic = "Lynx Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -484,7 +485,6 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
     }
     return nSigOps;
 }
-
 
 
 
@@ -980,7 +980,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
         // Remove conflicting transactions from the mempool
         BOOST_FOREACH(const CTxMemPool::txiter it, allConflicting)
         {
-            LogPrint("mempool", "replacing tx %s with %s for %s LTC additional fees, %d delta bytes\n",
+            LogPrint("mempool", "replacing tx %s with %s for %s LYNX additional fees, %d delta bytes\n",
                     it->GetTx().GetHash().ToString(),
                     hash.ToString(),
                     FormatMoney(nModifiedFees - nConflictingFees),
@@ -1163,16 +1163,134 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     return true;
 }
 
-CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
+static int generateMTRandom(unsigned int s, int range)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
+    std::mt19937 gen(s);
+    std::uniform_int_distribution<> dist(1, range);
+    return dist(gen);
+}
 
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
+CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& params, const uint256& prevHash)
+{
+    int64_t nSubsidy = 1000 * COIN;
+
+    std::string cseed_str = prevHash.ToString().substr(7,7);
+    const char* cseed = cseed_str.c_str();
+    long seed = hex2long(cseed);
+    int rand = generateMTRandom(seed, 99999);
+
+    int rand1 = 0;
+    int rand2 = 0;
+    int rand3 = 0;
+    int rand4 = 0;
+    int rand5 = 0;
+
+    //start with the old kittehcoin schedule, the block rewards remain the same until we hit the hardfork
+    int height1 = 200000;
+    int height2 = 400000;
+    int height3 = 600000;
+    int height4 = 800000;
+    int height5 = 1000000;
+    int height6 = 1200000;
+
+    if(nHeight <=  params.HardForkHeight)
+    {
+
+        if(nHeight < height1)
+        {
+                nSubsidy = (1 + rand) * COIN > nSubsidy ? (1 + rand) * COIN : nSubsidy;
+        }
+        else if(nHeight < height2)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand1 = generateMTRandom(seed, 49999);
+                nSubsidy = (1 + rand1) * COIN > nSubsidy ? (1 + rand1) * COIN : nSubsidy;
+        }
+        else if(nHeight < height3)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand2 = generateMTRandom(seed, 24999);
+                nSubsidy = (1 + rand2) * COIN > nSubsidy ? (1 + rand2) * COIN : nSubsidy;
+        }
+        else if(nHeight < height4)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand3 = generateMTRandom(seed, 12499);
+                nSubsidy = (1 + rand3) * COIN > nSubsidy ? (1 + rand3) * COIN : nSubsidy;
+        }
+        else if(nHeight < height5)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand4 = generateMTRandom(seed, 6249);
+                nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
+        }
+        else if(nHeight < height6)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand5 = generateMTRandom(seed, 3124);
+                nSubsidy = (1 + rand5) * COIN > nSubsidy ? (1 + rand5) * COIN : nSubsidy;
+        }
+    }
+    else if(nHeight <= params.HardFork2Height)
+    {
+        rand = generateMTRandom(seed, 49999);
+
+        //new hard forked coin specs, different payout schedule
+        height1 = 200000;
+        height2 = 400000;
+        height3 = 500000;
+        height4 = 600000;
+        height5 = 700000;
+
+        if(nHeight < height1)
+        {
+                nSubsidy = (1 + rand) * COIN > nSubsidy ? (1 + rand) * COIN : nSubsidy;
+        }
+        else if(nHeight < height2)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand1 = generateMTRandom(seed, 24999);
+                nSubsidy = (1 + rand1) * COIN > nSubsidy ? (1 + rand1) * COIN : nSubsidy;
+        }
+        else if(nHeight < height3)
+        {
+                cseed_str = prevHash.ToString().substr(6,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand2 = generateMTRandom(seed, 12499);
+                nSubsidy = (1 + rand2) * COIN > nSubsidy ? (1 + rand2) * COIN : nSubsidy;
+        }
+        else if(nHeight < height4)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand3 = generateMTRandom(seed, 6249);
+                nSubsidy = (1 + rand3) * COIN > nSubsidy ? (1 + rand3) * COIN : nSubsidy;
+        }
+        else if(nHeight < height5)
+        {
+                cseed_str = prevHash.ToString().substr(7,7);
+                cseed = cseed_str.c_str();
+                seed = hex2long(cseed);
+                rand4 = generateMTRandom(seed, 3124);
+                nSubsidy = (1 + rand4) * COIN > nSubsidy ? (1 + rand4) * COIN : nSubsidy;
+        }
+        else nSubsidy = 2000 * COIN;
+    } else nSubsidy = 1 * COIN;
+
     return nSubsidy;
 }
 
@@ -1194,9 +1312,9 @@ bool IsInitialBlockDownload()
     if (chainActive.Tip() == NULL)
         return true;
     if (chainActive.Tip()->nChainWork < UintToArith256(chainParams.GetConsensus().nMinimumChainWork))
-        return true;
+         return true;
     if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
-        return true;
+         return true;
     latchToFalse.store(true, std::memory_order_relaxed);
     return false;
 }
@@ -1386,7 +1504,8 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
 
             // If prev is coinbase, check that it's matured
             if (coins->IsCoinBase()) {
-                if (nSpendHeight - coins->nHeight < COINBASE_MATURITY)
+                int coinbaseMaturity = ::Params().GetConsensus().GetCoinbaseMaturity(coins->nHeight);
+                if (nSpendHeight - coins->nHeight < coinbaseMaturity)
                     return state.Invalid(false,
                         REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                         strprintf("tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight));
@@ -1929,12 +2048,19 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime3 - nTime2), 0.001 * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * 0.000001);
 
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
-    if (block.vtx[0]->GetValueOut() > blockReward)
-        return state.DoS(100,
-                         error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
-                               block.vtx[0]->GetValueOut(), blockReward),
-                               REJECT_INVALID, "bad-cb-amount");
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus(), hashPrevBlock);
+    if (block.vtx[0]->GetValueOut() > blockReward) {
+        std::string BlockHash = pindex->GetBlockHash().ToString();
+        if (pindex->nHeight > chainparams.GetConsensus().HardFork2Height)
+            return state.DoS(100,
+                error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
+                    block.vtx[0]->GetValueOut(), blockReward),
+                    REJECT_INVALID, "bad-cb-amount");
+
+        LogPrintf("LynxWarning: Block (height=%d, hash=%s, fees=%d, txCount=%d): coinbase pays too much (actual=%d vs limit=%d)\n",
+                pindex->nHeight, BlockHash.c_str(), nFees, block.vtx.size(),
+                block.vtx[0]->GetValueOut(), blockReward);
+    }
 
     if (!control.Wait())
         return state.DoS(100, false);
@@ -2992,17 +3118,32 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     // Reject outdated version blocks when 95% (75% on testnet) of the network has upgraded:
     // check for version 2, 3 and 4 upgrades
-    if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
-       (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
-       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
-            return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
-                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
+// TODO: requires additional research
+//    if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
+//       (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
+//       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
+//            return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
+//                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
     if (block.nVersion < VERSIONBITS_TOP_BITS && IsWitnessEnabled(pindexPrev, consensusParams))
         return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
                                  strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
     return true;
+}
+
+static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, unsigned int nToCheck)
+{
+    // KittehCoin: temporarily disable v2 block lockin until we are ready for v2 transition
+    // return false; SFS commented out
+    unsigned int nFound = 0;
+    for (unsigned int i = 0; i < nToCheck && nFound < nRequired && pstart != NULL; i++)
+    {
+        if (pstart->nVersion >= minVersion)
+            ++nFound;
+        pstart = pstart->pprev;
+    }
+    return (nFound >= nRequired);
 }
 
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev)
@@ -3027,12 +3168,18 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, const Co
     }
 
     // Enforce rule that the coinbase starts with serialized block height
-    if (nHeight >= consensusParams.BIP34Height)
+    if (block.nVersion >= 2)
     {
-        CScript expect = CScript() << nHeight;
-        if (block.vtx[0]->vin[0].scriptSig.size() < expect.size() ||
-            !std::equal(expect.begin(), expect.end(), block.vtx[0]->vin[0].scriptSig.begin())) {
-            return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+        bool isTestNet = GetBoolArg("-testnet", false);
+        // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
+        if ((!isTestNet && IsSuperMajority(2, pindexPrev, 750, 1000)) ||
+            (isTestNet && IsSuperMajority(2, pindexPrev, 51, 100)))
+        {
+            CScript expect = CScript() << nHeight;
+            if (block.vtx[0]->vin[0].scriptSig.size() < expect.size() ||
+                !std::equal(expect.begin(), expect.end(), block.vtx[0]->vin[0].scriptSig.begin())) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+            }
         }
     }
 

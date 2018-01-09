@@ -17,6 +17,7 @@
 #include "utilmoneystr.h"
 #include "utiltime.h"
 #include "version.h"
+#include "chainparams.h"
 
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                                  int64_t _nTime, double _entryPriority, unsigned int _entryHeight,
@@ -556,7 +557,8 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
                     continue;
                 const CCoins *coins = pcoins->AccessCoins(txin.prevout.hash);
                 if (nCheckFrequency != 0) assert(coins);
-                if (!coins || (coins->IsCoinBase() && ((signed long)nMemPoolHeight) - coins->nHeight < COINBASE_MATURITY)) {
+                int coinbaseMaturity = Params().GetConsensus().GetCoinbaseMaturity(coins->nHeight);
+                if (!coins || (coins->IsCoinBase() && ((signed long)nMemPoolHeight) - coins->nHeight < coinbaseMaturity)) {
                     txToRemove.insert(it);
                     break;
                 }

@@ -609,7 +609,7 @@ void SendCoinsDialog::updateGlobalFeeVariables()
         CoinControlDialog::coinControl->nMinimumTotalFee = 0;
 
         // show the estimated required time for confirmation
-        ui->confirmationTargetLabel->setText(GUIUtil::formatDurationStr(nConfirmTarget * Params().GetConsensus().nPowTargetSpacing) + " / " + tr("%n block(s)", "", nConfirmTarget));
+        ui->confirmationTargetLabel->setText(GUIUtil::formatDurationStr(nConfirmTarget * Params().GetConsensus().GetPowTargetSpacing(chainActive.Height())) + " / " + tr("%n block(s)", "", nConfirmTarget));
     }
     else
     {
@@ -764,7 +764,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
         }
         else if (!addr.IsValid()) // Invalid address
         {
-            ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid Litecoin address"));
+            ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid Lynx address"));
         }
         else // Valid address
         {
