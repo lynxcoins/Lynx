@@ -52,6 +52,8 @@ struct Params {
     int HardForkHeight;
     /** Block number at which the second hard fork will be performed */
     int HardFork2Height;
+    /** Block number at which the third hard fork (DigiShield) will be performed */
+    int HardFork3Height;
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.

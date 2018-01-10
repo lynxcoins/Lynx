@@ -77,6 +77,7 @@ public:
         consensus.BIP66Height = 811879; // 7aceee012833fa8952f8835d8b1b3ae233cd6ab08fdb27a771d2bd7bdc491894
         consensus.HardForkHeight = 126250;
         consensus.HardFork2Height = 1711675;
+        consensus.HardFork3Height = 1745024;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 1 * 60 * 60; // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 30;
@@ -189,6 +190,7 @@ public:
         consensus.BIP66Height = 76; // 8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573
         consensus.HardForkHeight = 100;
         consensus.HardFork2Height = 200;
+        consensus.HardFork3Height = 300;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 1 * 60 * 60; // // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 60;
@@ -278,6 +280,7 @@ public:
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
         consensus.HardForkHeight = -1;
         consensus.HardFork2Height = -1;
+        consensus.HardFork3Height = -1;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // two weeks
         consensus.PowTargetSpacingV1 = 60;

@@ -233,13 +233,86 @@ static unsigned int GetNextWorkRequired_Litecoin(const CBlockIndex* pindexLast, 
     return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
 }
 
+static unsigned int GetNextWorkRequired_DigiShield(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+{
+    // DigiShield difficulty retarget system
+    arith_uint256 bnProofOfWorkLimit = UintToArith256(params.powLimit);
+    unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
+    bool fTestNet = false;
+    int blockstogoback = 0;
+    int64_t nTargetSpacing = params.GetPowTargetSpacing(pindexLast->nHeight+1);
+    int64_t retargetTimespan = nTargetSpacing;
+    int64_t retargetSpacing = nTargetSpacing;
+    int64_t retargetInterval = retargetTimespan / retargetSpacing;
+	
+    // Genesis block
+    if (pindexLast == NULL) return nProofOfWorkLimit;
+
+    // Only change once per interval
+    if ((pindexLast->nHeight+1) % retargetInterval != 0){
+      // Special difficulty rule for testnet:
+        if (fTestNet){
+            // If the new block's timestamp is more than 2* 10 minutes
+            // then allow mining of a min-difficulty block.
+            if (pblock->nTime > pindexLast->nTime + retargetSpacing*2)
+                return nProofOfWorkLimit;
+        else {
+            // Return the last non-special-min-difficulty-rules-block
+            const CBlockIndex* pindex = pindexLast;
+            while (pindex->pprev && pindex->nHeight % retargetInterval != 0 && pindex->nBits == nProofOfWorkLimit)
+                pindex = pindex->pprev;
+            return pindex->nBits;
+        }
+      }
+      return pindexLast->nBits;
+    }
+
+    // DigiByte: This fixes an issue where a 51% attack can change difficulty at will.
+    // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+    blockstogoback = retargetInterval-1;
+    if ((pindexLast->nHeight+1) != retargetInterval) blockstogoback = retargetInterval;
+
+    // Go back by what we want to be 14 days worth of blocks
+    const CBlockIndex* pindexFirst = pindexLast;
+    for (int i = 0; pindexFirst && i < blockstogoback; i++)
+        pindexFirst = pindexFirst->pprev;
+    assert(pindexFirst);
+
+    // Limit adjustment step
+    int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
+    LogPrintf("  nActualTimespan = %g before bounds\n", nActualTimespan);
+
+    arith_uint256 bnNew;
+    bnNew.SetCompact(pindexLast->nBits);
+
+    if (nActualTimespan < (retargetTimespan - (retargetTimespan/4)) ) nActualTimespan = (retargetTimespan - (retargetTimespan/4));
+    if (nActualTimespan > (retargetTimespan + (retargetTimespan/2)) ) nActualTimespan = (retargetTimespan + (retargetTimespan/2));
+
+    // Retarget
+    bnNew *= nActualTimespan;
+    bnNew /= retargetTimespan;
+
+    /// debug print
+    LogPrintf("DigiShield RETARGET \n");
+    LogPrintf("retargetTimespan = %g    nActualTimespan = %g \n", retargetTimespan, nActualTimespan);
+    LogPrintf("Before: %08x  %s\n", pindexLast->nBits, arith_uint256().SetCompact(pindexLast->nBits).ToString().c_str());
+    LogPrintf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString().c_str());
+
+    if (bnNew > bnProofOfWorkLimit)
+        bnNew = bnProofOfWorkLimit;
+
+    return bnNew.GetCompact();
+}
+
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     if(pindexLast->nHeight <= params.HardForkHeight)
         return GetNextWorkRequired_V1(pindexLast, pblock, params);
     if(pindexLast->nHeight <= params.HardFork2Height)
         return GetNextWorkRequired_V2(pindexLast, pblock, params);
-    return GetNextWorkRequired_Litecoin(pindexLast, pblock, params);
+    if (pindexLast->nHeight <= params.HardFork3Height)
+        return GetNextWorkRequired_Litecoin(pindexLast, pblock, params);
+    return GetNextWorkRequired_DigiShield(pindexLast, pblock, params);
 }
 
 unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
