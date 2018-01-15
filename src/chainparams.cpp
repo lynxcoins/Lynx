@@ -77,7 +77,7 @@ public:
         consensus.BIP66Height = 811879; // 7aceee012833fa8952f8835d8b1b3ae233cd6ab08fdb27a771d2bd7bdc491894
         consensus.HardForkHeight = 126250;
         consensus.HardFork2Height = 1711675;
-        consensus.HardFork3Height = 1745024;
+        consensus.HardFork3Height = 1838000;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 1 * 60 * 60; // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 30;
