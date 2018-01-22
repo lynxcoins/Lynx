@@ -4328,11 +4328,30 @@ int CMerkleTx::GetBlocksToMaturity() const
 {
     if (!IsCoinBase())
         return 0;
-    return std::max(0, (COINBASE_MATURITY+1) - GetDepthInMainChain());
+    return std::max(0, (GetCoinbaseMaturity()+1) - GetDepthInMainChain());
 }
-
 
 bool CMerkleTx::AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state)
 {
     return ::AcceptToMemoryPool(mempool, state, tx, true, nullptr, nullptr, false, nAbsurdFee);
 }
+
+int CMerkleTx::GetCoinbaseMaturity() const
+{
+    AssertLockHeld(cs_main);
+    
+    int defaultCoinbaseMaturity = Params().GetConsensus().GetCoinbaseMaturity(chainActive.Height());
+    if (hashUnset())
+        return defaultCoinbaseMaturity;
+
+    // Find the block it claims to be in
+    BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
+    if (mi == mapBlockIndex.end())
+        return defaultCoinbaseMaturity;
+    CBlockIndex* pindex = (*mi).second;
+    if (!pindex || !chainActive.Contains(pindex))
+        return defaultCoinbaseMaturity;
+
+    return Params().GetConsensus().GetCoinbaseMaturity(pindex->nHeight);
+}
+
