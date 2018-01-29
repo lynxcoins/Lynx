@@ -18,7 +18,7 @@
 
 static bool isTestnet()
 {
-    return GetBoolArg("-testnet", false);
+    return gArgs.GetBoolArg("-testnet", false);
 }
 
 static int64_t GetTargetSpacing(const Consensus::Params& params)

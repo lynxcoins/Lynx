@@ -1328,53 +1328,6 @@ int GetSpendHeight(const CCoinsViewCache& inputs)
     return pindexPrev->nHeight + 1;
 }
 
-namespace Consensus {
-bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight)
-{
-        // This doesn't trigger the DoS code on purpose; if it did, it would make it easier
-        // for an attacker to attempt to split the network.
-        if (!inputs.HaveInputs(tx))
-            return state.Invalid(false, 0, "", "Inputs unavailable");
-
-        CAmount nValueIn = 0;
-        CAmount nFees = 0;
-        for (unsigned int i = 0; i < tx.vin.size(); i++)
-        {
-            const COutPoint &prevout = tx.vin[i].prevout;
-            const CCoins *coins = inputs.AccessCoins(prevout.hash);
-            assert(coins);
-
-            // If prev is coinbase, check that it's matured
-            if (coins->IsCoinBase()) {
-                int coinbaseMaturity = ::Params().GetConsensus().GetCoinbaseMaturity(coins->nHeight);
-                if (nSpendHeight - coins->nHeight < coinbaseMaturity)
-                    return state.Invalid(false,
-                        REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
-                        strprintf("tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight));
-            }
-
-            // Check for negative or overflow input values
-            nValueIn += coins->vout[prevout.n].nValue;
-            if (!MoneyRange(coins->vout[prevout.n].nValue) || !MoneyRange(nValueIn))
-                return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
-
-        }
-
-        if (nValueIn < tx.GetValueOut())
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-in-belowout", false,
-                strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(tx.GetValueOut())));
-
-        // Tally transaction fees
-        CAmount nTxFee = nValueIn - tx.GetValueOut();
-        if (nTxFee < 0)
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-negative");
-        nFees += nTxFee;
-        if (!MoneyRange(nFees))
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-outofrange");
-    return true;
-}
-}// namespace Consensus
-
 static CuckooCache::cache<uint256, SignatureCacheHasher> scriptExecutionCache;
 static uint256 scriptExecutionCacheNonce(GetRandHash());
 
@@ -3159,7 +3112,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
     // Enforce rule that the coinbase starts with serialized block height
     if (block.nVersion >= 2)
     {
-        bool isTestNet = GetBoolArg("-testnet", false);
+        bool isTestNet = gArgs.GetBoolArg("-testnet", false);
         // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
         if ((!isTestNet && IsSuperMajority(2, pindexPrev, 750, 1000)) ||
             (isTestNet && IsSuperMajority(2, pindexPrev, 51, 100)))

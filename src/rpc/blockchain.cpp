@@ -1487,11 +1487,6 @@ UniValue getchaintxstats(const JSONRPCRequest& request)
         );
 
     const CBlockIndex* pindex;
-    int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().nPowTargetSpacing; // By default: 1 month
-
-    if (request.params.size() > 0 && !request.params[0].isNull()) {
-        blockcount = request.params[0].get_int();
-    }
 
     bool havehash = request.params.size() > 1 && !request.params[1].isNull();
     uint256 hash;
@@ -1513,6 +1508,12 @@ UniValue getchaintxstats(const JSONRPCRequest& request)
         } else {
             pindex = chainActive.Tip();
         }
+    }
+
+    int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().GetPowTargetSpacing(pindex->nHeight + 1); // By default: 1 month
+
+    if (request.params.size() > 0 && !request.params[0].isNull()) {
+        blockcount = request.params[0].get_int();
     }
 
     if (blockcount < 1 || blockcount >= pindex->nHeight) {

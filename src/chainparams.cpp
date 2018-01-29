@@ -12,6 +12,8 @@
 
 #include <assert.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include "chainparamsseeds.h"
 
 static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
@@ -129,26 +131,28 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.push_back(CDNSSeedData("seed00.getlynx.io", "seed00.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed01.getlynx.io", "seed01.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed02.getlynx.io", "seed02.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed03.getlynx.io", "seed03.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed04.getlynx.io", "seed04.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed05.getlynx.io", "seed05.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed06.getlynx.io", "seed06.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed07.getlynx.io", "seed07.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed08.getlynx.io", "seed08.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed09.getlynx.io", "seed09.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed10.getlynx.io", "seed10.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed11.getlynx.io", "seed11.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed12.getlynx.io", "seed12.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed13.getlynx.io", "seed13.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed14.getlynx.io", "seed14.getlynx.io"));
-        vSeeds.push_back(CDNSSeedData("seed15.getlynx.io", "seed15.getlynx.io"));
-        // vSeeds.push_back(CDNSSeedData("kittehcoin.info", "dnsseed.kittehcoin.info"));
-        // vSeeds.push_back(CDNSSeedData("kittehcoinwallet.com", "dnsseed.kittehcoinwallet.com"));
-        // vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
-        // vSeeds.push_back(CDNSSeedData("kittehcoinpool.com", "dnsseed.kittehcoinpool.com"));
+        vSeeds.emplace_back("seed00.getlynx.io", false);
+        vSeeds.emplace_back("seed01.getlynx.io", false);
+        vSeeds.emplace_back("seed02.getlynx.io", false);
+        vSeeds.emplace_back("seed03.getlynx.io", false);
+        vSeeds.emplace_back("seed04.getlynx.io", false);
+        vSeeds.emplace_back("seed05.getlynx.io", false);
+        vSeeds.emplace_back("seed06.getlynx.io", false);
+        vSeeds.emplace_back("seed07.getlynx.io", false);
+        vSeeds.emplace_back("seed08.getlynx.io", false);
+        vSeeds.emplace_back("seed09.getlynx.io", false);
+        vSeeds.emplace_back("seed10.getlynx.io", false);
+        vSeeds.emplace_back("seed11.getlynx.io", false);
+        vSeeds.emplace_back("seed12.getlynx.io", false);
+        vSeeds.emplace_back("seed13.getlynx.io", false);
+        vSeeds.emplace_back("seed14.getlynx.io", false);
+        vSeeds.emplace_back("seed15.getlynx.io", false);
+
+        //vSeeds.emplace_back("seed-a.litecoin.loshan.co.uk", true);
+        //vSeeds.emplace_back("dnsseed.thrasher.io", true);
+        //vSeeds.emplace_back("dnsseed.litecointools.com", true);
+        //vSeeds.emplace_back("dnsseed.litecoinpool.org", true);
+        //vSeeds.emplace_back("dnsseed.koin-project.com", false);
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,45);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,22);
@@ -238,6 +242,9 @@ public:
         vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
         vSeeds.push_back(CDNSSeedData("kittehcoinblockexplorer.com", "dnsseed.kittehcoinblockexplorer.com"));
+        //vSeeds.emplace_back("testnet-seed.litecointools.com", true);
+        //vSeeds.emplace_back("seed-b.litecoin.loshan.co.uk", true);
+        //vSeeds.emplace_back("dnsseed-testnet.thrasher.io", true);
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
