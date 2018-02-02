@@ -89,6 +89,8 @@ public:
         consensus.PowTargetSpacingV1 = 30;
         consensus.PowTargetSpacingV2 = 60;
         consensus.PowTargetSpacingV3 = 30;
+        consensus.CoinbaseMaturity = COINBASE_MATURITY;
+        consensus.CoinbaseMaturity2 = COINBASE_MATURITY2;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 6048; // 75% of 8064
@@ -202,6 +204,8 @@ public:
         consensus.PowTargetSpacingV1 = 60;
         consensus.PowTargetSpacingV2 = 60;
         consensus.PowTargetSpacingV3 = 60;
+        consensus.CoinbaseMaturity = TESTNET_COINBASE_MATURITY;
+        consensus.CoinbaseMaturity2 = TESTNET_COINBASE_MATURITY;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -294,6 +298,8 @@ public:
         consensus.PowTargetSpacingV1 = 60;
         consensus.PowTargetSpacingV2 = 60;
         consensus.PowTargetSpacingV3 = 60;
+        consensus.CoinbaseMaturity = TESTNET_COINBASE_MATURITY;
+        consensus.CoinbaseMaturity2 = TESTNET_COINBASE_MATURITY;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
