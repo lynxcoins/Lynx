@@ -1,11 +1,11 @@
 Lynx Core
 =====================================
 
-https://getlynx.io
+[https://getlynx.io](https://getlynx.io)
 
 ## What is Lynx?
 
-Lynx is a secure cryptocurrency with fast transaction speeds and low-transaction fees. It’s also eco-friendly & easy-to-use. In 2017, our team upgraded and rebranded an existing coin (MEOW) as Lynx. How? We successfully forked Litecoin and ported the Kittehcoin blockchain history to it. This gives Lynx all the benefits of Litecoin with the full transaction history of Kittehcoin. These upgrades fixed the flaws in the original coin and revived its community of users. It’s cryptocurrency from the past; redesigned for the future.
+Lynx is a secure cryptocurrency with fast transaction speeds and low-transaction fees. It’s also eco-friendly & easy-to-use. In 2017, our team upgraded and rebranded an existing coin (MEOW) as Lynx. How? We successfully forked Litecoin and ported the [Kittehcoin](https://kittehcoin.io) blockchain history to it. This gives Lynx all the benefits of Litecoin with the full transaction history of Kittehcoin. These upgrades fixed the flaws in the original coin and revived its community of users. It’s cryptocurrency from the past; redesigned for the future.
 
 ## How is Lynx an "eco-friendly cryptocurrency"?
 
@@ -18,6 +18,10 @@ According to a recent article in [Wired magazine](https://www.wired.com/story/bi
 3. The cost of a transaction is 1 Lynx/kb with a cap of 10 Lynx.
 
 Lynx is a cryptocurrency from the past re-designed for the future. We designed Lynx to have minimal environmental impact because we’re committed to creating global solutions and maintaining a small carbon footprint. Lynx business rules encourage the use of low-cost computing (like a Raspberry Pi which only consumes less than 3 watts of electricity) to mine the coin. As a result, the electrical cost to maintain the Lynx network is a fraction of a fraction which results in a low environmental impact. The emphasis on low-cost computing also creates a decentralized, broad miner base which also strengthens the stability and security of the currency.
+
+## Where to download desktop wallets?
+
+[https://getlynx.io/downloads/](https://getlynx.io/downloads/)
 
 ## License
 
