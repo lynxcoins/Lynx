@@ -828,80 +828,85 @@ double CBlockPolicyEstimator::estimateConservativeFee(unsigned int doubleTarget,
  */
 CFeeRate CBlockPolicyEstimator::estimateSmartFee(int confTarget, FeeCalculation *feeCalc, bool conservative) const
 {
-    LOCK(cs_feeEstimator);
-
+    /* Smart fee calculation is turned off due to limitations of max fee and large prise per kB*/
     if (feeCalc) {
-        feeCalc->desiredTarget = confTarget;
-        feeCalc->returnedTarget = confTarget;
+        feeCalc->reason = FeeReason::FALLBACK;
     }
-
-    double median = -1;
-    EstimationResult tempResult;
-
-    // Return failure if trying to analyze a target we're not tracking
-    if (confTarget <= 0 || (unsigned int)confTarget > longStats->GetMaxConfirms()) {
-        return CFeeRate(0);  // error condition
-    }
-
-    // It's not possible to get reasonable estimates for confTarget of 1
-    if (confTarget == 1) confTarget = 2;
-
-    unsigned int maxUsableEstimate = MaxUsableEstimate();
-    if ((unsigned int)confTarget > maxUsableEstimate) {
-        confTarget = maxUsableEstimate;
-    }
-    if (feeCalc) feeCalc->returnedTarget = confTarget;
-
-    if (confTarget <= 1) return CFeeRate(0); // error condition
-
-    assert(confTarget > 0); //estimateCombinedFee and estimateConservativeFee take unsigned ints
-    /** true is passed to estimateCombined fee for target/2 and target so
-     * that we check the max confirms for shorter time horizons as well.
-     * This is necessary to preserve monotonically increasing estimates.
-     * For non-conservative estimates we do the same thing for 2*target, but
-     * for conservative estimates we want to skip these shorter horizons
-     * checks for 2*target because we are taking the max over all time
-     * horizons so we already have monotonically increasing estimates and
-     * the purpose of conservative estimates is not to let short term
-     * fluctuations lower our estimates by too much.
-     */
-    double halfEst = estimateCombinedFee(confTarget/2, HALF_SUCCESS_PCT, true, &tempResult);
-    if (feeCalc) {
-        feeCalc->est = tempResult;
-        feeCalc->reason = FeeReason::HALF_ESTIMATE;
-    }
-    median = halfEst;
-    double actualEst = estimateCombinedFee(confTarget, SUCCESS_PCT, true, &tempResult);
-    if (actualEst > median) {
-        median = actualEst;
-        if (feeCalc) {
-            feeCalc->est = tempResult;
-            feeCalc->reason = FeeReason::FULL_ESTIMATE;
-        }
-    }
-    double doubleEst = estimateCombinedFee(2 * confTarget, DOUBLE_SUCCESS_PCT, !conservative, &tempResult);
-    if (doubleEst > median) {
-        median = doubleEst;
-        if (feeCalc) {
-            feeCalc->est = tempResult;
-            feeCalc->reason = FeeReason::DOUBLE_ESTIMATE;
-        }
-    }
-
-    if (conservative || median == -1) {
-        double consEst =  estimateConservativeFee(2 * confTarget, &tempResult);
-        if (consEst > median) {
-            median = consEst;
-            if (feeCalc) {
-                feeCalc->est = tempResult;
-                feeCalc->reason = FeeReason::CONSERVATIVE;
-            }
-        }
-    }
-
-    if (median < 0) return CFeeRate(0); // error condition
-
-    return CFeeRate(median);
+    return CFeeRate(0);
+//    LOCK(cs_feeEstimator);
+//
+//    if (feeCalc) {
+//        feeCalc->desiredTarget = confTarget;
+//        feeCalc->returnedTarget = confTarget;
+//    }
+//
+//    double median = -1;
+//    EstimationResult tempResult;
+//
+//    // Return failure if trying to analyze a target we're not tracking
+//    if (confTarget <= 0 || (unsigned int)confTarget > longStats->GetMaxConfirms()) {
+//        return CFeeRate(0);  // error condition
+//    }
+//
+//    // It's not possible to get reasonable estimates for confTarget of 1
+//    if (confTarget == 1) confTarget = 2;
+//
+//    unsigned int maxUsableEstimate = MaxUsableEstimate();
+//    if ((unsigned int)confTarget > maxUsableEstimate) {
+//        confTarget = maxUsableEstimate;
+//    }
+//    if (feeCalc) feeCalc->returnedTarget = confTarget;
+//
+//    if (confTarget <= 1) return CFeeRate(0); // error condition
+//
+//    assert(confTarget > 0); //estimateCombinedFee and estimateConservativeFee take unsigned ints
+//    /** true is passed to estimateCombined fee for target/2 and target so
+//     * that we check the max confirms for shorter time horizons as well.
+//     * This is necessary to preserve monotonically increasing estimates.
+//     * For non-conservative estimates we do the same thing for 2*target, but
+//     * for conservative estimates we want to skip these shorter horizons
+//     * checks for 2*target because we are taking the max over all time
+//     * horizons so we already have monotonically increasing estimates and
+//     * the purpose of conservative estimates is not to let short term
+//     * fluctuations lower our estimates by too much.
+//     */
+//    double halfEst = estimateCombinedFee(confTarget/2, HALF_SUCCESS_PCT, true, &tempResult);
+//    if (feeCalc) {
+//        feeCalc->est = tempResult;
+//        feeCalc->reason = FeeReason::HALF_ESTIMATE;
+//    }
+//    median = halfEst;
+//    double actualEst = estimateCombinedFee(confTarget, SUCCESS_PCT, true, &tempResult);
+//    if (actualEst > median) {
+//        median = actualEst;
+//        if (feeCalc) {
+//            feeCalc->est = tempResult;
+//            feeCalc->reason = FeeReason::FULL_ESTIMATE;
+//        }
+//    }
+//    double doubleEst = estimateCombinedFee(2 * confTarget, DOUBLE_SUCCESS_PCT, !conservative, &tempResult);
+//    if (doubleEst > median) {
+//        median = doubleEst;
+//        if (feeCalc) {
+//            feeCalc->est = tempResult;
+//            feeCalc->reason = FeeReason::DOUBLE_ESTIMATE;
+//        }
+//    }
+//
+//    if (conservative || median == -1) {
+//        double consEst =  estimateConservativeFee(2 * confTarget, &tempResult);
+//        if (consEst > median) {
+//            median = consEst;
+//            if (feeCalc) {
+//                feeCalc->est = tempResult;
+//                feeCalc->reason = FeeReason::CONSERVATIVE;
+//            }
+//        }
+//    }
+//
+//    if (median < 0) return CFeeRate(0); // error condition
+//
+//    return CFeeRate(median);
 }
 
 
