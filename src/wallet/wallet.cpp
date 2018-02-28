@@ -2838,7 +2838,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // because we must be at the maximum allowed fee.
                 if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes))
                 {
-                    strFailReason = _("Transaction too large for fee policy");
+                    strFailReason = strprintf("Transaction too large for fee policy. \n Transaction size: %d, FeeNeeded: %d, FeeLimitation: %d",
+                    nBytes, nFeeNeeded, ::minRelayTxFee.GetFee(nBytes));
                     return false;
                 }
 

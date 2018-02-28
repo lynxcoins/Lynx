@@ -1035,7 +1035,7 @@
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayoutFee9">
-                 <item>
+                 <!-- <item>
                   <layout class="QVBoxLayout" name="verticalLayoutFee6">
                    <item>
                     <widget class="QLabel" name="labelSmartFee3">
@@ -1061,8 +1061,8 @@
                     </spacer>
                    </item>
                   </layout>
-                 </item>
-                 <item>
+                 </item>  -->
+                 <!-- <item>
                   <layout class="QVBoxLayout" name="verticalLayoutFee5">
                    <property name="rightMargin">
                     <number>30</number>
@@ -1089,9 +1089,9 @@
                       </spacer>
                      </item>
                     </layout>
-                   </item>
-                  </layout>
-                 </item>
+                   </item> -->
+                  <!-- </layout>
+                 </item> -->
                 </layout>
                </item>
                <item>

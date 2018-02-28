@@ -171,11 +171,11 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         coinControlUpdateLabels();
 
         // fee section
-        for (const int &n : confTargets) {
-            ui->confTargetSelector->addItem(tr("%1 (%2 blocks)").arg(GUIUtil::formatNiceTimeOffset(n*Params().GetConsensus().GetPowTargetSpacing(chainActive.Height()))).arg(n));
-        }
-        connect(ui->confTargetSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmartFeeLabel()));
-        connect(ui->confTargetSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(coinControlUpdateLabels()));
+        // for (const int &n : confTargets) {
+        //     ui->confTargetSelector->addItem(tr("%1 (%2 blocks)").arg(GUIUtil::formatNiceTimeOffset(n*Params().GetConsensus().GetPowTargetSpacing(chainActive.Height()))).arg(n));
+        // }
+        // connect(ui->confTargetSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSmartFeeLabel()));
+        // connect(ui->confTargetSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(coinControlUpdateLabels()));
         connect(ui->groupFee, SIGNAL(buttonClicked(int)), this, SLOT(updateFeeSectionControls()));
         connect(ui->groupFee, SIGNAL(buttonClicked(int)), this, SLOT(coinControlUpdateLabels()));
         connect(ui->groupCustomFee, SIGNAL(buttonClicked(int)), this, SLOT(coinControlUpdateLabels()));
@@ -202,10 +202,10 @@ void SendCoinsDialog::setModel(WalletModel *_model)
             settings.setValue("nConfTarget", nConfirmTarget);
             settings.remove("nSmartFeeSliderPosition");
         }
-        if (settings.value("nConfTarget").toInt() == 0)
-            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(model->getDefaultConfirmTarget()));
-        else
-            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(settings.value("nConfTarget").toInt()));
+        // if (settings.value("nConfTarget").toInt() == 0)
+        //     ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(model->getDefaultConfirmTarget()));
+        // else
+        //     ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(settings.value("nConfTarget").toInt()));
     }
 }
 
@@ -215,7 +215,7 @@ SendCoinsDialog::~SendCoinsDialog()
     settings.setValue("fFeeSectionMinimized", fFeeMinimized);
     settings.setValue("nFeeRadio", ui->groupFee->checkedId());
     settings.setValue("nCustomFeeRadio", ui->groupCustomFee->checkedId());
-    settings.setValue("nConfTarget", getConfTargetForIndex(ui->confTargetSelector->currentIndex()));
+//    settings.setValue("nConfTarget", getConfTargetForIndex(ui->confTargetSelector->currentIndex()));
     settings.setValue("nTransactionFee", (qint64)ui->customFee->value());
     settings.setValue("fPayOnlyMinFee", ui->checkBoxMinimumFee->isChecked());
 
@@ -615,10 +615,10 @@ void SendCoinsDialog::setMinimumFee()
 
 void SendCoinsDialog::updateFeeSectionControls()
 {
-    ui->confTargetSelector      ->setEnabled(ui->radioSmartFee->isChecked());
+ //   ui->confTargetSelector      ->setEnabled(ui->radioSmartFee->isChecked());
     ui->labelSmartFee           ->setEnabled(ui->radioSmartFee->isChecked());
     ui->labelSmartFee2          ->setEnabled(ui->radioSmartFee->isChecked());
-    ui->labelSmartFee3          ->setEnabled(ui->radioSmartFee->isChecked());
+  //  ui->labelSmartFee3          ->setEnabled(ui->radioSmartFee->isChecked());
     ui->labelFeeEstimation      ->setEnabled(ui->radioSmartFee->isChecked());
     ui->checkBoxMinimumFee      ->setEnabled(ui->radioCustomFee->isChecked());
     ui->labelMinFeeWarning      ->setEnabled(ui->radioCustomFee->isChecked());
@@ -656,7 +656,7 @@ void SendCoinsDialog::updateCoinControlState(CCoinControl& ctrl)
     }
     // Avoid using global defaults when sending money from the GUI
     // Either custom fee will be used or if not selected, the confirmation target from dropdown box
-    ctrl.m_confirm_target = getConfTargetForIndex(ui->confTargetSelector->currentIndex());
+    //ctrl.m_confirm_target = getConfTargetForIndex(ui->confTargetSelector->currentIndex());
     ctrl.signalRbf = ui->optInRBF->isChecked();
 }
 
