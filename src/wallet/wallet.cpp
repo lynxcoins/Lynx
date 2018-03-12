@@ -2931,13 +2931,16 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             }
         }
 
+        auto txSize = txNew.vin.size();
         // Embed the constructed transaction data in wtxNew.
         wtxNew.SetTx(MakeTransactionRef(std::move(txNew)));
 
         // Limit size
         if (GetTransactionWeight(wtxNew) >= MAX_STANDARD_TX_WEIGHT)
         {
-            strFailReason = _("Transaction too large");
+            //strFailReason = _("Transaction too large");
+            strFailReason = strprintf("Transaction too large. \n Transaction size: %d, Transaction Weight: %d, TransactionMaxWeight: %d, Number of input transactions: %d",
+            nBytes, GetTransactionWeight(wtxNew), MAX_STANDARD_TX_WEIGHT, txSize);
             return false;
         }
     }
