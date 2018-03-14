@@ -52,7 +52,7 @@ static const bool DEFAULT_WHITELISTFORCERELAY = true;
 /** Recommended -minrelaytxfee, minimum relay fee for transactions */
 static const unsigned int DEFAULT_MIN_RELAY_TX_FEE = 1 * COIN; //100000;
 /** minimum relay fee for transactions */
-static const unsigned int DEFAULT_MIN_CUSTOM_FEE = 0.01 * COIN; //100000;
+static const unsigned int DEFAULT_MIN_CUSTOM_FEE = 0.00001 * COIN; //1000;
 //! -maxtxfee default
 static const CAmount DEFAULT_TRANSACTION_MAXFEE = 1000 * 0.1 * COIN;
 //! Discourage users to set fees higher than this amount (in satoshis) per kB
@@ -136,7 +136,7 @@ static const unsigned int DEFAULT_BANSCORE_THRESHOLD = 100;
 /** Default for -persistmempool */
 static const bool DEFAULT_PERSIST_MEMPOOL = true;
 /** Default for -mempoolreplacement */
-static const bool DEFAULT_ENABLE_REPLACEMENT = true;
+static const bool DEFAULT_ENABLE_REPLACEMENT = false;
 /** Default for using fee filter */
 static const bool DEFAULT_FEEFILTER = true;
 
@@ -163,7 +163,6 @@ extern CTxMemPool mempool;
 typedef std::unordered_map<uint256, CBlockIndex*, BlockHasher> BlockMap;
 extern BlockMap mapBlockIndex;
 extern uint64_t nLastBlockTx;
-extern uint64_t nLastBlockSize;
 extern uint64_t nLastBlockWeight;
 extern const std::string strMessageMagic;
 extern CWaitableCriticalSection csBestBlock;
@@ -187,6 +186,9 @@ extern bool fEnableReplacement;
 
 /** Block hash whose ancestors we will assume to have valid scripts without checking them. */
 extern uint256 hashAssumeValid;
+
+/** Minimum work we will assume exists on some valid chain. */
+extern arith_uint256 nMinimumChainWork;
 
 /** Best header we've seen so far (used for getheaders queries' starting points). */
 extern CBlockIndex *pindexBestHeader;
@@ -247,8 +249,9 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
  * @param[out] state This may be set to an Error state if any error occurred processing them
  * @param[in]  chainparams The params for the chain we want to connect to
  * @param[out] ppindex If set, the pointer will be set to point to the last new block index object for the given headers
+ * @param[out] first_invalid First header that fails validation, if one exists
  */
-bool ProcessNewBlockHeaders(const std::vector<CBlockHeader>& block, CValidationState& state, const CChainParams& chainparams, const CBlockIndex** ppindex=nullptr);
+bool ProcessNewBlockHeaders(const std::vector<CBlockHeader>& block, CValidationState& state, const CChainParams& chainparams, const CBlockIndex** ppindex=nullptr, CBlockHeader *first_invalid=nullptr);
 
 /** Check whether enough disk space is available for an incoming block */
 bool CheckDiskSpace(uint64_t nAdditionalBytes = 0);
@@ -275,15 +278,11 @@ bool IsInitialBlockDownload();
 bool GetTransaction(const uint256 &hash, CTransactionRef &tx, const Consensus::Params& params, uint256 &hashBlock, bool fAllowSlow = false);
 /** Find the best known block, and make it the tip of the block chain */
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, std::shared_ptr<const CBlock> pblock = std::shared_ptr<const CBlock>());
+//CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams); //LYNX
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& params, const uint256& prevHash);
 
 /** Guess verification progress (as a fraction between 0.0=genesis and 1.0=current tip). */
 double GuessVerificationProgress(const ChainTxData& data, CBlockIndex* pindex);
-
-/**
- *  Mark one block file as pruned.
- */
-void PruneOneBlockFile(const int fileNumber);
 
 /**
  *  Mark one block file as pruned.
@@ -477,9 +476,6 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
 static const unsigned int REJECT_INTERNAL = 0x100;
 /** Too high fee. Can not be triggered by P2P transactions */
 static const unsigned int REJECT_HIGHFEE = 0x100;
-
-/** Get block file info entry for one block file */
-CBlockFileInfo* GetBlockFileInfo(size_t n);
 
 /** Get block file info entry for one block file */
 CBlockFileInfo* GetBlockFileInfo(size_t n);

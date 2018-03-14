@@ -81,6 +81,7 @@ BASE_SCRIPTS= [
     # vv Tests less than 30s vv
     'keypool-topup.py',
     'zmq_test.py',
+    'bitcoin_cli.py',
     'mempool_resurrect_test.py',
     'txn_doublespend.py --mineblock',
     'txn_clone.py',
@@ -121,6 +122,8 @@ BASE_SCRIPTS= [
     'bip65-cltv-p2p.py',
     'uptime.py',
     'resendwallettransactions.py',
+    'minchainwork.py',
+    'p2p-acceptblock.py',
 ]
 
 EXTENDED_SCRIPTS = [
@@ -148,7 +151,6 @@ EXTENDED_SCRIPTS = [
     'txn_clone.py --mineblock',
     'forknotify.py',
     'invalidateblock.py',
-    'p2p-acceptblock.py',
     'replace-by-fee.py',
 ]
 
@@ -280,6 +282,7 @@ def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_cove
     #Set env vars
     if "LITECOIND" not in os.environ:
         os.environ["LITECOIND"] = build_dir + '/src/litecoind' + exeext
+        os.environ["LITECOINCLI"] = build_dir + '/src/litecoin-cli' + exeext
 
     tests_dir = src_dir + '/test/functional/'
 
@@ -462,7 +465,7 @@ class RPCCoverage(object):
     Coverage calculation works by having each test script subprocess write
     coverage files into a particular directory. These files contain the RPC
     commands invoked during testing, as well as a complete listing of RPC
-    commands per `bitcoin-cli help` (`rpc_interface.txt`).
+    commands per `litecoin-cli help` (`rpc_interface.txt`).
 
     After all tests complete, the commands run are combined and diff'd against
     the complete list to calculate uncovered RPC commands.
