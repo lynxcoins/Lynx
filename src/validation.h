@@ -50,11 +50,11 @@ static const bool DEFAULT_WHITELISTRELAY = true;
 /** Default for DEFAULT_WHITELISTFORCERELAY. */
 static const bool DEFAULT_WHITELISTFORCERELAY = true;
 /** Recommended -minrelaytxfee, minimum relay fee for transactions */
-static const unsigned int DEFAULT_MIN_RELAY_TX_FEE = 1 * COIN; //100000;
+static const unsigned int DEFAULT_MIN_RELAY_TX_FEE = 0.00001 * COIN; //1000;
 /** minimum relay fee for transactions */
 static const unsigned int DEFAULT_MIN_CUSTOM_FEE = 0.00001 * COIN; //1000;
 //! -maxtxfee default
-static const CAmount DEFAULT_TRANSACTION_MAXFEE = 1000 * 0.1 * COIN;
+static const CAmount DEFAULT_TRANSACTION_MAXFEE = 0.1 * COIN;
 //! Discourage users to set fees higher than this amount (in satoshis) per kB
 static const CAmount HIGH_TX_FEE_PER_KB = 1000 * 0.01 * COIN;
 //! -maxtxfee will warn if called with a higher fee than this amount (in satoshis)
