@@ -127,8 +127,8 @@ BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
         BOOST_CHECK(node->fDisconnect == false);
     }
 
-    //SetMockTime(GetTime() + 3*consensusParams.nPowTargetSpacing + 1); //LYNX
-    SetMockTime(GetTime() + 3*consensusParams.GetPowTargetSpacing(consensusParams.HardFork2Height + 1) + 1);
+    //SetMockTime(GetTime() + 3*consensusParams.nPowTargetSpacing + 1); //LYNX: litecoin nPowTargetSpacing is 10 times larger
+    SetMockTime(GetTime() + 30*consensusParams.GetPowTargetSpacing(consensusParams.HardFork2Height + 1) + 1);
 
     // Now tip should definitely be stale, and we should look for an extra
     // outbound peer
