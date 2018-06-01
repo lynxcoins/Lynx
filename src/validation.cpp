@@ -41,10 +41,12 @@
 #include "validationinterface.h"
 #include "versionbits.h"
 #include "warnings.h"
+#include "base58.h"
 
 #include <atomic>
 #include <sstream>
 #include <random>
+#include <algorithm>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -1753,6 +1755,25 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
 }
 
 
+std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
+{
+    std::vector<std::string> destinations;
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+        if (txout.nValue > 0)
+        {
+            txnouttype type;
+            std::vector<CTxDestination> addresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, addresses, nRequired);
+            for (const CTxDestination& addr : addresses)
+                destinations.push_back(CBitcoinAddress(addr).ToString());
+        }
+    }
+    return destinations;
+}
+
+
 
 static int64_t nTimeCheck = 0;
 static int64_t nTimeForks = 0;
@@ -1962,6 +1983,28 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
         return state.DoS(100, error("%s: CheckQueue failed", __func__), REJECT_INVALID, "block-validation-failed");
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;
     LogPrint(BCLog::BENCH, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime4 - nTime2), nInputs <= 1 ? 0 : 0.001 * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * 0.000001);
+
+    // lynx-special checks (Ben's rules)
+
+    // rule1:
+    // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
+    // such destination in coinbase tx
+
+    std::vector<std::string> destinations = GetTransactionDestinations(block.vtx[0]);
+    CBlockIndex* prev_pindex = pindex->pprev;
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+
+    for (int i = 0; i < 10 && prev_pindex != NULL; i++, prev_pindex = prev_pindex->pprev)
+    {
+        CBlock prev_block;
+        if (!ReadBlockFromDisk(prev_block, prev_pindex, consensusParams))
+            return error("ConnectBlock(): ReadBlockFromDisk failed");
+
+        for (const auto& prev_destination : GetTransactionDestinations(prev_block.vtx[0]))
+            if (destinations.end() != std::find(destinations.begin(), destinations.end(), prev_destination))
+                return state.DoS(100,
+                    error("ConnectBlock(): new blocks with coinbase destination %s are temporarily not allowed", prev_destination), REJECT_INVALID, "bad-cb-destination");
+    }
 
     if (fJustCheck)
         return true;
