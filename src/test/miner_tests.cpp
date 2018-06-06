@@ -240,6 +240,9 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         pblock->hashPrevBlock = pblock->GetHash();
     }
 
+    /* ptr to last block which do not uses scriptPubKey variable */
+    CBlockIndex* pindex_tmp = chainActive.Tip();
+
     // Just to make sure we can still make simple blocks
     BOOST_CHECK(pblocktemplate = AssemblerForTest(chainparams).CreateNewBlock(scriptPubKey));
 
@@ -379,6 +382,24 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         next->BuildSkip();
         chainActive.SetTip(next);
     }
+
+    /* here we modify last 10 block indexes to force successful check of Ben's new validation rules.
+       It should be possible to read corresponding blocks from disk and check coinbase transaction destination,
+       so we use old blocks saved to disk in the beginning of the test */
+    CBlockIndex* cur_index = chainActive.Tip();
+    for (int i = 0; i < 10; i++)
+    {
+        BOOST_CHECK(pindex_tmp != nullptr); /* will fail if we do not have enough pre-generated blocks to satisfy Ben's 1st rule */
+        delete cur_index->phashBlock;
+        cur_index->phashBlock = pindex_tmp->phashBlock;
+        cur_index->nStatus = pindex_tmp->nStatus;
+        cur_index->nFile = pindex_tmp->nFile;
+        cur_index->nDataPos = pindex_tmp->nDataPos;
+        cur_index = cur_index->pprev;
+        pindex_tmp = pindex_tmp->pprev;
+    }
+    pcoinsTip->SetBestBlock(chainActive.Tip()->GetBlockHash());
+
     BOOST_CHECK(pblocktemplate = AssemblerForTest(chainparams).CreateNewBlock(scriptPubKey));
     // Extend to a 210000-long block chain.
     while (chainActive.Tip()->nHeight < 840000) {
@@ -391,7 +412,27 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         next->BuildSkip();
         chainActive.SetTip(next);
     }
+
+    BOOST_CHECK(pindex_tmp != nullptr); /* will fail if we do not have enough pre-generated blocks to satisfy Ben's 1st rule */
+    cur_index = chainActive.Tip();
+    delete cur_index->phashBlock;
+    cur_index->phashBlock = pindex_tmp->phashBlock;
+    cur_index->nStatus = pindex_tmp->nStatus;
+    cur_index->nFile = pindex_tmp->nFile;
+    cur_index->nDataPos = pindex_tmp->nDataPos;
+    pindex_tmp = pindex_tmp->pprev;
+    pcoinsTip->SetBestBlock(cur_index->GetBlockHash());
+
     BOOST_CHECK(pblocktemplate = AssemblerForTest(chainparams).CreateNewBlock(scriptPubKey));
+
+    /* code to avoid deletion of reused phashBlock */
+    cur_index = chainActive.Tip();
+    for (int i = 0; i < (10 + 1); i++)
+    {
+        cur_index->phashBlock = new uint256(InsecureRand256());
+        cur_index = cur_index->pprev;
+    }
+
     // Delete the dummy blocks again.
     while (chainActive.Tip()->nHeight > nHeight) {
         CBlockIndex* del = chainActive.Tip();
