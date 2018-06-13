@@ -2009,6 +2009,20 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
     if (fJustCheck)
         return true;
 
+    // rule3:
+    // the last 2 digits found in the address (encoded in base58), as a string, must match the last
+    // 2 digit of the block hash value (encoded in base58) submitted by the miner in the candidate block.
+    std::string nonce_base58 = EncodeBase58((const unsigned char*)&(block.nNonce), (const unsigned char*)&(block.nNonce) + sizeof(block.nNonce));
+    std::vector<std::string> dest = GetTransactionDestinations(block.vtx[0]);
+
+    std::string address_last2 = dest[0].substr(dest[0].size() - 2);
+    std::string nonce_last2 = nonce_base58.substr(nonce_base58.size() - 2);
+
+    if (address_last2 != nonce_last2)
+        return state.DoS(100,
+            error("ConnectBlock(): nonce (codede in base58) and first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
+
+
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS))
     {
