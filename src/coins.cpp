@@ -7,8 +7,12 @@
 #include "consensus/consensus.h"
 #include "memusage.h"
 #include "random.h"
+#include "base58.h"
+#include "util.h"
 
 #include <assert.h>
+#include <sstream>
+#include <iomanip>
 
 bool CCoinsView::GetCoin(const COutPoint &outpoint, Coin &coin) const { return false; }
 uint256 CCoinsView::GetBestBlock() const { return uint256(); }
@@ -243,6 +247,74 @@ bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
         }
     }
     return true;
+}
+
+CAmount CCoinsViewCache::GetAddressBalance(std::string address)
+{
+    /* We calculate balance as sum of all unspent transaction outputs from
+     * underlying CCoinsViewDB which not exist in current CCoinsViewCache and
+     * entries cached in current CCoinsViewCache
+     */
+
+    CAmount balance = 0;
+
+    std::unique_ptr<CCoinsViewCursor> pcursor(base->Cursor());
+    while (pcursor->Valid()) {
+        COutPoint key;
+        Coin coin;
+        if (pcursor->GetKey(key) && pcursor->GetValue(coin)) {
+            if (cacheCoins.end() == cacheCoins.find(key)) { 
+                txnouttype type;
+                std::vector<CTxDestination> addresses;
+                int nRequired;
+                ExtractDestinations(coin.out.scriptPubKey, type, addresses, nRequired);
+
+                // XXX: need to discuss if we should count transaction of other types
+                if (type == TX_PUBKEY || type == TX_PUBKEYHASH) {
+                    assert(addresses.size() == 1);
+                    for (const CTxDestination& addr : addresses) {
+                        std::string s = CBitcoinAddress(addr).ToString();
+                        if (s.compare(address) == 0)
+                            balance += coin.out.nValue;
+
+                        std::ostringstream oss;
+                        oss << "UTXO1 addr " << s << ": " << std::setw(30) << coin.out.nValue << "\n";
+                        LogPrintf(oss.str().c_str());
+                    }
+                }
+            }
+        } else {
+            throw std::logic_error("unable to read required value from UTXO database");
+        }
+        pcursor->Next();
+    }
+
+    for (CCoinsMap::iterator it = cacheCoins.begin(); it != cacheCoins.end(); it++) {
+        if (it->second.coin.IsSpent())
+            continue;
+
+        txnouttype type;
+        std::vector<CTxDestination> addresses;
+        int nRequired;
+
+        ExtractDestinations(it->second.coin.out.scriptPubKey, type, addresses, nRequired);
+
+        // XXX: need to discuss if we should count transaction of other types
+        if (type == TX_PUBKEY || type == TX_PUBKEYHASH) {
+            assert(addresses.size() == 1);
+            for (const CTxDestination& addr : addresses)
+            {
+                std::string s = CBitcoinAddress(addr).ToString();
+                if (s.compare(address) == 0)
+                    balance += it->second.coin.out.nValue;
+
+                std::ostringstream oss;
+                oss << "UTXO2 addr " << s << ": " << std::setw(30) << it->second.coin.out.nValue << "\n";
+                LogPrintf(oss.str().c_str());
+            }
+        }
+    }
+    return balance;
 }
 
 static const size_t MIN_TRANSACTION_OUTPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxOut(), SER_NETWORK, PROTOCOL_VERSION);
