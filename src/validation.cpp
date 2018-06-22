@@ -47,6 +47,7 @@
 #include <sstream>
 #include <random>
 #include <algorithm>
+#include <iomanip>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -1760,8 +1761,7 @@ std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
     std::vector<std::string> destinations;
     for (unsigned int i = 0; i < tx->vout.size(); i++) {
         const CTxOut& txout = tx->vout[i];
-        if (txout.nValue > 0)
-        {
+        if (txout.nValue > 0) {
             txnouttype type;
             std::vector<CTxDestination> addresses;
             int nRequired;
@@ -1773,7 +1773,35 @@ std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
     return destinations;
 }
 
+// copypasted from rpc/blockchain.cpp */
+double GetDifficulty2(const CBlockIndex* blockindex)
+{
+    if (blockindex == nullptr)
+    {
+        if (chainActive.Tip() == nullptr)
+            return 1.0;
+        else
+            blockindex = chainActive.Tip();
+    }
 
+    int nShift = (blockindex->nBits >> 24) & 0xff;
+
+    double dDiff =
+        (double)0x0000ffff / (double)(blockindex->nBits & 0x00ffffff);
+
+    while (nShift < 29)
+    {
+        dDiff *= 256.0;
+        nShift++;
+    }
+    while (nShift > 29)
+    {
+        dDiff /= 256.0;
+        nShift--;
+    }
+
+    return dDiff;
+}
 
 static int64_t nTimeCheck = 0;
 static int64_t nTimeForks = 0;
@@ -1984,13 +2012,16 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;
     LogPrint(BCLog::BENCH, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime4 - nTime2), nInputs <= 1 ? 0 : 0.001 * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * 0.000001);
 
+    if (fJustCheck)
+        return true;
+
     // lynx-special checks (Ben's rules)
 
     // rule1:
     // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
     // such destination in coinbase tx
 
-    std::vector<std::string> destinations = GetTransactionDestinations(block.vtx[0]);
+    std::vector<std::string> coinbase_destinations = GetTransactionDestinations(block.vtx[0]);
     CBlockIndex* prev_pindex = pindex->pprev;
     const Consensus::Params& consensusParams = Params().GetConsensus();
 
@@ -2001,13 +2032,21 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
             return error("ConnectBlock(): ReadBlockFromDisk failed");
 
         for (const auto& prev_destination : GetTransactionDestinations(prev_block.vtx[0]))
-            if (destinations.end() != std::find(destinations.begin(), destinations.end(), prev_destination))
+            if (coinbase_destinations.end() != std::find(coinbase_destinations.begin(), coinbase_destinations.end(), prev_destination))
                 return state.DoS(100,
                     error("ConnectBlock(): new blocks with coinbase destination %s are temporarily not allowed", prev_destination), REJECT_INVALID, "bad-cb-destination");
     }
 
-    if (fJustCheck)
-        return true;
+    // rule2:
+    // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
+    // in the miners reward address and the difficulty value of the previous 10th block
+
+    CAmount balance = pcoinsTip->GetAddressBalance(coinbase_destinations[0]);
+
+    std::ostringstream oss;
+    oss << "Balance for " << coinbase_destinations[0] << ": " << balance << "\n";
+    oss << "Difficulty 10 blocks ago was " << GetDifficulty2(prev_pindex) << "\n";
+    LogPrintf(oss.str().c_str());
 
     // rule3:
     // the last 2 digits found in the address (encoded in base58), as a string, must match the last
@@ -2018,10 +2057,11 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
     std::string address_last2 = dest[0].substr(dest[0].size() - 2);
     std::string nonce_last2 = nonce_base58.substr(nonce_base58.size() - 2);
 
+    /*
     if (address_last2 != nonce_last2)
         return state.DoS(100,
             error("ConnectBlock(): nonce (codede in base58) and first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
-
+    */
 
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS))
