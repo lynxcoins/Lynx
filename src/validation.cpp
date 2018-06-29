@@ -1773,6 +1773,22 @@ std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
     return destinations;
 }
 
+std::string GetTransactionFirstAddress(CTransactionRef tx)
+{
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+        if (txout.nValue > 0) {
+            txnouttype type;
+            std::vector<CTxDestination> addresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, addresses, nRequired);
+            if (!addresses.empty())
+                return CBitcoinAddress(addresses[0]).ToString();
+        }
+    }
+    return std::string(); // nothing found - return empty string
+}
+
 // copypasted from rpc/blockchain.cpp */
 double GetDifficulty2(const CBlockIndex* blockindex)
 {
@@ -2049,18 +2065,25 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
     LogPrintf(oss.str().c_str());
 
     // rule3:
-    // the last 2 digits found in the address (encoded in base58), as a string, must match the last
-    // 2 digit of the block hash value (encoded in base58) submitted by the miner in the candidate block.
-    std::string nonce_base58 = EncodeBase58((const unsigned char*)&(block.nNonce), (const unsigned char*)&(block.nNonce) + sizeof(block.nNonce));
-    std::vector<std::string> dest = GetTransactionDestinations(block.vtx[0]);
+    // the last 2 chars in the sha256 hash of address, must match the last
+    // 2 chars of the block hash value submitted by the miner in the candidate block.
+    std::string addr = GetTransactionFirstAddress(block.vtx[0]);
+    if (addr.empty())
+        return error("ConnectBlock(): GetTransactionFirstAddress failed. Address was not found");
 
-    std::string address_last2 = dest[0].substr(dest[0].size() - 2);
-    std::string nonce_last2 = nonce_base58.substr(nonce_base58.size() - 2);
+    unsigned char addr_sha256_raw[CSHA256::OUTPUT_SIZE];
+    CSHA256().Write((const unsigned char*)addr.c_str(), addr.size()).Finalize(addr_sha256_raw);
+    std::string addr_hex = HexStr(addr_sha256_raw, addr_sha256_raw + CSHA256::OUTPUT_SIZE);
+    std::string block_hex = block.GetHash().ToString();
 
-    /*
-    if (address_last2 != nonce_last2)
+    LogPrintf("Reward address: %s\n", addr.c_str());
+    LogPrintf("Address_hash: %s\n", addr_hex.c_str());
+    LogPrintf("Block hash: %s\n", block_hex.c_str());
+
+    /* commented until changes in generate API
+    if (addr_hex.compare(addr_hex.size() - 2, 2, block_hex, block_hex.size() - 2, 2) != 0)
         return state.DoS(100,
-            error("ConnectBlock(): nonce (codede in base58) and first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
+            error("ConnectBlock(): block hash and sha256 hash of the first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
     */
 
     // Write undo information to disk
