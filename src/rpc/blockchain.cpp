@@ -75,6 +75,26 @@ double GetDifficulty(const CBlockIndex* blockindex)
     return dDiff;
 }
 
+double GetDifficultyPrevN(const CBlockIndex* blockindex, int prevcount)
+{
+    if (blockindex == nullptr)
+    {
+        if (chainActive.Tip() == nullptr)
+            return 1.0;
+        else
+            blockindex = chainActive.Tip();
+    }
+
+    const CBlockIndex* prev_pindex = blockindex;
+    for (int i = 0; i < prevcount && prev_pindex != nullptr; i++)
+        prev_pindex = prev_pindex->pprev;
+
+    if (prev_pindex == nullptr)
+        return 1.0;
+
+    return GetDifficulty(prev_pindex);
+}
+
 UniValue blockheaderToJSON(const CBlockIndex* blockindex)
 {
     UniValue result(UniValue::VOBJ);
