@@ -25,6 +25,7 @@
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "random.h"
+#include "rpc/blockchain.h"
 #include "reverse_iterator.h"
 #include "script/script.h"
 #include "script/sigcache.h"
@@ -1756,23 +1757,6 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
 }
 
 
-std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
-{
-    std::vector<std::string> destinations;
-    for (unsigned int i = 0; i < tx->vout.size(); i++) {
-        const CTxOut& txout = tx->vout[i];
-        if (txout.nValue > 0) {
-            txnouttype type;
-            std::vector<CTxDestination> addresses;
-            int nRequired;
-            ExtractDestinations(txout.scriptPubKey, type, addresses, nRequired);
-            for (const CTxDestination& addr : addresses)
-                destinations.push_back(CBitcoinAddress(addr).ToString());
-        }
-    }
-    return destinations;
-}
-
 std::string GetTransactionFirstAddress(CTransactionRef tx)
 {
     for (unsigned int i = 0; i < tx->vout.size(); i++) {
@@ -1787,36 +1771,6 @@ std::string GetTransactionFirstAddress(CTransactionRef tx)
         }
     }
     return std::string(); // nothing found - return empty string
-}
-
-// copypasted from rpc/blockchain.cpp */
-double GetDifficulty2(const CBlockIndex* blockindex)
-{
-    if (blockindex == nullptr)
-    {
-        if (chainActive.Tip() == nullptr)
-            return 1.0;
-        else
-            blockindex = chainActive.Tip();
-    }
-
-    int nShift = (blockindex->nBits >> 24) & 0xff;
-
-    double dDiff =
-        (double)0x0000ffff / (double)(blockindex->nBits & 0x00ffffff);
-
-    while (nShift < 29)
-    {
-        dDiff *= 256.0;
-        nShift++;
-    }
-    while (nShift > 29)
-    {
-        dDiff /= 256.0;
-        nShift--;
-    }
-
-    return dDiff;
 }
 
 static int64_t nTimeCheck = 0;
@@ -2032,59 +1986,53 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
         return true;
 
     // lynx-special checks (Ben's rules)
-
-    // rule1:
-    // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
-    // such destination in coinbase tx
-
-    std::vector<std::string> coinbase_destinations = GetTransactionDestinations(block.vtx[0]);
-    CBlockIndex* prev_pindex = pindex->pprev;
-    const Consensus::Params& consensusParams = Params().GetConsensus();
-
-    for (int i = 0; i < 10 && prev_pindex != NULL; i++, prev_pindex = prev_pindex->pprev)
+    if (pindex->nHeight > chainparams.GetConsensus().HardFork4Height)
     {
-        CBlock prev_block;
-        if (!ReadBlockFromDisk(prev_block, prev_pindex, consensusParams))
-            return error("ConnectBlock(): ReadBlockFromDisk failed");
+        // rule1:
+        // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
+        // such destination in coinbase tx
+        std::vector<std::string> coinbase_destinations = GetTransactionDestinations(block.vtx[0]);
+        CBlockIndex* prev_pindex = pindex->pprev;
+        const Consensus::Params& consensusParams = Params().GetConsensus();
 
-        for (const auto& prev_destination : GetTransactionDestinations(prev_block.vtx[0]))
-            if (coinbase_destinations.end() != std::find(coinbase_destinations.begin(), coinbase_destinations.end(), prev_destination))
-                return state.DoS(100,
+        for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && prev_pindex != NULL; i++, prev_pindex = prev_pindex->pprev)
+        {
+            CBlock prev_block;
+            if (!ReadBlockFromDisk(prev_block, prev_pindex, consensusParams))
+                return error("ConnectBlock(): ReadBlockFromDisk failed");
+
+            for (const auto& prev_destination : GetTransactionDestinations(prev_block.vtx[0]))
+                if (coinbase_destinations.end() != std::find(coinbase_destinations.begin(), coinbase_destinations.end(), prev_destination))
+                {
+                    return state.DoS(100,
                     error("ConnectBlock(): new blocks with coinbase destination %s are temporarily not allowed", prev_destination), REJECT_INVALID, "bad-cb-destination");
+                }
+        }
+
+        // rule2:
+        // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
+        // in the miners reward address and the difficulty value of the previous 10th block
+        CAmount balance = pcoinsTip->GetAddressBalance(coinbase_destinations[0]);
+        double rule_difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4DifficultyPrevBlockCount);
+        std::ostringstream oss;
+        oss << "Balance for " << coinbase_destinations[0] << ": " << balance << "\n";
+        oss << "Difficulty 10 blocks ago was " << rule_difficulty << "\n";
+        LogPrintf(oss.str().c_str());
+        if (balance < consensusParams.HardFork4BalanceThreshold * rule_difficulty)
+        {
+            return state.DoS(100,
+                error("ConnectBlock(): not enough coins on address"), REJECT_INVALID, "bad-cb-destination");
+        }
+
+        // rule3:
+        // the last 2 chars in the sha256 hash of address, must match the last
+        // 2 chars of the block hash value submitted by the miner in the candidate block.
+        if (!CheckProofOfStakeRule3(&block, chainparams.GetConsensus()))
+        {
+            return state.DoS(100,
+                error("ConnectBlock(): block hash and sha256 hash of the first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
+        }
     }
-
-    // rule2:
-    // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
-    // in the miners reward address and the difficulty value of the previous 10th block
-
-    CAmount balance = pcoinsTip->GetAddressBalance(coinbase_destinations[0]);
-
-    std::ostringstream oss;
-    oss << "Balance for " << coinbase_destinations[0] << ": " << balance << "\n";
-    oss << "Difficulty 10 blocks ago was " << GetDifficulty2(prev_pindex) << "\n";
-    LogPrintf(oss.str().c_str());
-
-    // rule3:
-    // the last 2 chars in the sha256 hash of address, must match the last
-    // 2 chars of the block hash value submitted by the miner in the candidate block.
-    std::string addr = GetTransactionFirstAddress(block.vtx[0]);
-    if (addr.empty())
-        return error("ConnectBlock(): GetTransactionFirstAddress failed. Address was not found");
-
-    unsigned char addr_sha256_raw[CSHA256::OUTPUT_SIZE];
-    CSHA256().Write((const unsigned char*)addr.c_str(), addr.size()).Finalize(addr_sha256_raw);
-    std::string addr_hex = HexStr(addr_sha256_raw, addr_sha256_raw + CSHA256::OUTPUT_SIZE);
-    std::string block_hex = block.GetHash().ToString();
-
-    LogPrintf("Reward address: %s\n", addr.c_str());
-    LogPrintf("Address_hash: %s\n", addr_hex.c_str());
-    LogPrintf("Block hash: %s\n", block_hex.c_str());
-
-    /* commented until changes in generate API
-    if (addr_hex.compare(addr_hex.size() - 2, 2, block_hex, block_hex.size() - 2, 2) != 0)
-        return state.DoS(100,
-            error("ConnectBlock(): block hash and sha256 hash of the first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
-    */
 
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS))

@@ -9,6 +9,7 @@
 #include "script/script.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "base58.h"
 
 
 typedef std::vector<unsigned char> valtype;
@@ -244,6 +245,23 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::
     }
 
     return true;
+}
+
+std::vector<std::string> GetTransactionDestinations(CTransactionRef tx)
+{
+    std::vector<std::string> destinations;
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+        if (txout.nValue > 0) {
+            txnouttype type;
+            std::vector<CTxDestination> addresses;
+            int nRequired;
+            ExtractDestinations(txout.scriptPubKey, type, addresses, nRequired);
+            for (const CTxDestination& addr : addresses)
+                destinations.push_back(CBitcoinAddress(addr).ToString());
+        }
+    }
+    return destinations;
 }
 
 namespace

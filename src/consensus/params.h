@@ -6,6 +6,7 @@
 #ifndef BITCOIN_CONSENSUS_PARAMS_H
 #define BITCOIN_CONSENSUS_PARAMS_H
 
+#include "amount.h"
 #include "uint256.h"
 #include "version.h"
 #include "consensus.h"
@@ -54,6 +55,16 @@ struct Params {
     int HardFork2Height;
     /** Block number at which the third hard fork (DigiShield) will be performed */
     int HardFork3Height;
+    /** Block number at which the fourth hard fork (pos rules) will be performed */
+    int HardFork4Height;
+    /** Minimum address balance threshold (see pos rule2) */
+    CAmount HardFork4BalanceThreshold;
+    /** Position of prev block that address must not win block (see rule1) */
+    int HardFork4AddressPrevBlockCount;
+    /** Position of prev block to get difficulty from (see rule2) */
+    int HardFork4DifficultyPrevBlockCount;
+    /** Numberof chars to check in address and block hash (see pos rule3) */
+    int HardFork4CheckLastCharsCount;
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
