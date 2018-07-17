@@ -13,7 +13,7 @@ CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& 
     return static_cast<CAmount>(consensusParams.HardFork4BalanceThreshold * threshold_difficulty);
 }
 
-bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
+bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
     if (pindex->nHeight <= consensusParams.HardFork4Height)
         return true; // The rule does not yet apply
@@ -34,17 +34,14 @@ bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Conse
         for (const auto& prevDestination : GetTransactionDestinations(prevBlock.vtx[0]))
         {
             if (coinbaseDestinations.end() != std::find(coinbaseDestinations.begin(), coinbaseDestinations.end(), prevDestination))
-            {
-                error("CheckLynxRule1(): new blocks with coinbase destination %s are temporarily not allowed", prevDestination);
-                return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
-            }
+                return error("CheckLynxRule1(): new blocks with coinbase destination %s are temporarily not allowed", prevDestination);
         }
     }
 
     return true;
 }
 
-bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
+bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
     if (pindex->nHeight <= consensusParams.HardFork4Height)
         return true; // The rule does not yet apply
@@ -62,17 +59,16 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
     CAmount thresholdBalance = GetThresholdBalance(pindex, consensusParams);
     if (balance < thresholdBalance)
     {
-        error("CheckLynxRule2(): not enough coins on address %s: balance=%i, thresholdBalance=%i",
+        return error("CheckLynxRule2(): not enough coins on address %s: balance=%i, thresholdBalance=%i",
             coinbaseDestinations[0], balance, thresholdBalance);
-        return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
     }
 
     return true;
 }
 
-bool CheckLynxRule3(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
+bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams)
 {
-    if (pindex->nHeight <= consensusParams.HardFork4Height)
+    if (nHeight <= consensusParams.HardFork4Height)
         return true; // The rule does not yet apply
    
     // rule3:
@@ -97,17 +93,21 @@ bool CheckLynxRule3(const CBlock* pblock, const CBlockIndex* pindex, const Conse
     bool res = 0 == addrHex.compare(addrHex.size() - lastCharsCount, lastCharsCount,
                                     blockHex, blockHex.size() - lastCharsCount, lastCharsCount);
     if (!res)
-    {
-        error("CheckLynxRule3(): block hash and sha256 hash of the first destination should last on the same 2 chars");
-        state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
-    }
+        return error("CheckLynxRule3(): block hash and sha256 hash of the first destination should last on the same 2 chars");
 
-    return res;
+    return true;
 }
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
 {
-    return CheckLynxRule1(pblock, pindex, consensusParams, state)
-        && CheckLynxRule2(pblock, pindex, consensusParams, state)
-        && CheckLynxRule3(pblock, pindex, consensusParams, state);
+    if (!CheckLynxRule1(pblock, pindex, consensusParams))
+        return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
+
+    if (!CheckLynxRule2(pblock, pindex, consensusParams))
+        return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
+    
+    if (!CheckLynxRule3(pblock, pindex->nHeight, consensusParams))
+        return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
+
+    return true;
 }

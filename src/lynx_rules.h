@@ -13,9 +13,9 @@ class CBlockIndex;
 
 CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 
-bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
-bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
-bool CheckLynxRule3(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
+bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
+bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
+bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams);
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
 

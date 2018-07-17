@@ -370,28 +370,3 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
     return true;
 }
-
-bool CheckProofOfStakeRule3(const CBlock *pblock, const Consensus::Params& params)
-{
-    // rule3:
-    // the last 2 chars in the sha256 hash of address, must match the last
-    // 2 chars of the block hash value submitted by the miner in the candidate block.
-
-    std::vector<std::string> dests = GetTransactionDestinations(pblock->vtx[0]);
-    if (dests.empty())
-        return error("ConnectBlock(): GetTransactionFirstAddress failed. Address was not found");
-
-    std::string addr = dests[0];
-    unsigned char addr_sha256_raw[CSHA256::OUTPUT_SIZE];
-    CSHA256().Write((const unsigned char*)addr.c_str(), addr.size()).Finalize(addr_sha256_raw);
-    std::string addr_hex = HexStr(addr_sha256_raw, addr_sha256_raw + CSHA256::OUTPUT_SIZE);
-    std::string block_hex = pblock->GetHash().ToString();
-
-    LogPrintf("Reward address: %s\n", addr.c_str());
-    LogPrintf("Address_hash: %s\n", addr_hex.c_str());
-    LogPrintf("Block hash: %s\n", block_hex.c_str());
-
-    return (addr_hex.compare(addr_hex.size() - params.HardFork4CheckLastCharsCount, params.HardFork4CheckLastCharsCount,
-                             block_hex,
-                             block_hex.size() - params.HardFork4CheckLastCharsCount, params.HardFork4CheckLastCharsCount) == 0);
-}
