@@ -25,7 +25,6 @@
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "random.h"
-#include "rpc/blockchain.h"
 #include "reverse_iterator.h"
 #include "script/script.h"
 #include "script/sigcache.h"
@@ -43,6 +42,8 @@
 #include "versionbits.h"
 #include "warnings.h"
 #include "base58.h"
+
+#include "lynx_rules.h"
 
 #include <atomic>
 #include <sstream>
@@ -1757,22 +1758,6 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
 }
 
 
-std::string GetTransactionFirstAddress(CTransactionRef tx)
-{
-    for (unsigned int i = 0; i < tx->vout.size(); i++) {
-        const CTxOut& txout = tx->vout[i];
-        if (txout.nValue > 0) {
-            txnouttype type;
-            std::vector<CTxDestination> addresses;
-            int nRequired;
-            ExtractDestinations(txout.scriptPubKey, type, addresses, nRequired);
-            if (!addresses.empty())
-                return CBitcoinAddress(addresses[0]).ToString();
-        }
-    }
-    return std::string(); // nothing found - return empty string
-}
-
 static int64_t nTimeCheck = 0;
 static int64_t nTimeForks = 0;
 static int64_t nTimeVerify = 0;
@@ -1986,53 +1971,8 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
         return true;
 
     // lynx-special checks (Ben's rules)
-    if (pindex->nHeight > chainparams.GetConsensus().HardFork4Height)
-    {
-        // rule1:
-        // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
-        // such destination in coinbase tx
-        std::vector<std::string> coinbase_destinations = GetTransactionDestinations(block.vtx[0]);
-        CBlockIndex* prev_pindex = pindex->pprev;
-        const Consensus::Params& consensusParams = Params().GetConsensus();
-
-        for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && prev_pindex != NULL; i++, prev_pindex = prev_pindex->pprev)
-        {
-            CBlock prev_block;
-            if (!ReadBlockFromDisk(prev_block, prev_pindex, consensusParams))
-                return error("ConnectBlock(): ReadBlockFromDisk failed");
-
-            for (const auto& prev_destination : GetTransactionDestinations(prev_block.vtx[0]))
-                if (coinbase_destinations.end() != std::find(coinbase_destinations.begin(), coinbase_destinations.end(), prev_destination))
-                {
-                    return state.DoS(100,
-                    error("ConnectBlock(): new blocks with coinbase destination %s are temporarily not allowed", prev_destination), REJECT_INVALID, "bad-cb-destination");
-                }
-        }
-
-        // rule2:
-        // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
-        // in the miners reward address and the difficulty value of the previous 10th block
-        CAmount balance = pcoinsTip->GetAddressBalance(coinbase_destinations[0]);
-        double rule_difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4DifficultyPrevBlockCount);
-        std::ostringstream oss;
-        oss << "Balance for " << coinbase_destinations[0] << ": " << balance << "\n";
-        oss << "Difficulty 10 blocks ago was " << rule_difficulty << "\n";
-        LogPrintf(oss.str().c_str());
-        if (balance < consensusParams.HardFork4BalanceThreshold * rule_difficulty)
-        {
-            return state.DoS(100,
-                error("ConnectBlock(): not enough coins on address"), REJECT_INVALID, "bad-cb-destination");
-        }
-
-        // rule3:
-        // the last 2 chars in the sha256 hash of address, must match the last
-        // 2 chars of the block hash value submitted by the miner in the candidate block.
-        if (!CheckProofOfStakeRule3(&block, chainparams.GetConsensus()))
-        {
-            return state.DoS(100,
-                error("ConnectBlock(): block hash and sha256 hash of the first destination should last on the same 2 chars"), REJECT_INVALID, "bad-cb-destination");
-        }
-    }
+    if (!CheckLynxRules(&block, pindex, chainparams.GetConsensus(), state))
+        return false;
 
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS))
