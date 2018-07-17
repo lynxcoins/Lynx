@@ -9,8 +9,8 @@
 
 CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    double threshold_difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
-    return static_cast<CAmount>(consensusParams.HardFork4BalanceThreshold * threshold_difficulty);
+    double thresholdDifficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
+    return static_cast<CAmount>(consensusParams.HardFork4BalanceThreshold * thresholdDifficulty);
 }
 
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
