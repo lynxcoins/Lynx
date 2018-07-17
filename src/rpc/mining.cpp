@@ -25,6 +25,7 @@
 #include "utilstrencodings.h"
 #include "validationinterface.h"
 #include "warnings.h"
+#include "lynx_rules.h"
 
 #include <memory>
 #include <stdint.h>
@@ -131,19 +132,9 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
 
         const Consensus::Params& consensusParams = Params().GetConsensus();
         // chainActive.Height() is current height, +1 - height of the new block
-        if ((chainActive.Height() + 1) <= consensusParams.HardFork4Height)
-        {
-            while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensusParams)) {
-                ++pblock->nNonce;
-                --nMaxTries;
-            }
-        }
-        else
-        {
-            while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && (!CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensusParams) || !CheckProofOfStakeRule3(pblock, consensusParams))) {
-                ++pblock->nNonce;
-                --nMaxTries;
-            }
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && (!CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensusParams) || !CheckLynxRule3(pblock, nHeight, consensusParams))) {
+            ++pblock->nNonce;
+            --nMaxTries;
         }
 
         if (nMaxTries == 0) {
