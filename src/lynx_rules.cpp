@@ -1,9 +1,11 @@
 #include <vector>
+#include <set>
 #include "consensus/validation.h"
 #include "rpc/blockchain.h"
 #include "validation.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "base58.h"
 #include "lynx_rules.h"
 
 
@@ -11,6 +13,75 @@ CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& 
 {
     double thresholdDifficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
     return static_cast<CAmount>(consensusParams.HardFork4BalanceThreshold * thresholdDifficulty);
+}
+
+static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::set<std::string>& result)
+{
+    for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
+    {
+        CBlock block;
+        if (!ReadBlockFromDisk(block, pindex, consensusParams))
+            return false;
+
+        std::vector<std::string> blockDests = GetTransactionDestinations(block.vtx[0]);
+        result.insert(blockDests.begin(), blockDests.end());
+    }
+
+    return true;
+}
+
+const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
+{
+    // rule1 prepare: get all addresses from last blocks
+    std::set<std::string> lastCoinbaseDestinations;
+    if (!GetLastCoinbaseDestinations(pindex, consensusParams, lastCoinbaseDestinations))
+        return nullptr;
+
+    // rule2 prepare: find amount threshold
+    CAmount thresholdBalance = GetThresholdBalance(pindex, consensusParams);
+    
+    // Find address
+    auto it  = balances.begin();
+    for (; it != balances.end(); ++it)
+    {
+        const CTxDestination& addr = it->first;
+        CAmount amount = it->second;
+        std::string strAddr = CBitcoinAddress(addr).ToString();
+
+        if (lastCoinbaseDestinations.count(strAddr) == 0  // rule1: check last blocks
+            && amount >= thresholdBalance)                // rule2: check balance
+        {
+            return &addr;
+        }
+    }
+
+    return nullptr;
+}
+
+bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::string& errorString)
+{
+    // rule1:
+    std::set<std::string> lastDestinations;
+    if (!GetLastCoinbaseDestinations(pindex, consensusParams, lastDestinations))
+    {
+        errorString = "Unable to get the latest Coinbase addresses";
+        return false;
+    }
+
+    if (lastDestinations.count(CBitcoinAddress(address).ToString()) != 0)
+    {
+        errorString = "Address get reward not long ago";
+        return false;
+    }
+
+    // rule2:
+    if (balance < GetThresholdBalance(pindex, consensusParams))
+    {
+        errorString = "Not enough coins on address";
+        return false;
+    }
+
+    return true;
 }
 
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
@@ -55,7 +126,11 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
         return error("CheckLynxRule2(): GetTransactionFirstAddress failed. Address was not found");
 
     const std::string& addr = coinbaseDestinations[0];
-    CAmount balance = pcoinsTip->GetAddressBalance(addr);
+    CAmount balance;
+    {
+        LOCK(cs_main);
+        balance = pcoinsTip->GetAddressBalance(addr);
+    }
     CAmount thresholdBalance = GetThresholdBalance(pindex, consensusParams);
     if (balance < thresholdBalance)
     {

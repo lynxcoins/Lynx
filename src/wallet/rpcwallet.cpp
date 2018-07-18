@@ -16,7 +16,6 @@
 #include "policy/fees.h"
 #include "policy/policy.h"
 #include "policy/rbf.h"
-#include "rpc/blockchain.h"
 #include "rpc/mining.h"
 #include "rpc/server.h"
 #include "script/sign.h"
@@ -27,6 +26,7 @@
 #include "wallet/feebumper.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
+#include "lynx_rules.h"
 
 #include <stdint.h>
 
@@ -3140,6 +3140,50 @@ UniValue bumpfee(const JSONRPCRequest& request)
     return result;
 }
 
+void GetScriptForMining(CWallet * const pwallet, std::shared_ptr<CReserveScript> coinbase_script)
+{
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+    
+    int height = 0;
+    CBlockIndex * cur_pindex;
+    {   // Don't keep cs_main locked
+        LOCK(cs_main);
+        height = chainActive.Height();
+        cur_pindex = chainActive.Tip();
+    }
+    if (!cur_pindex) {
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't get current block");
+    }
+
+    if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
+    {
+        pwallet->GetScriptForMining(coinbase_script);
+        // If the keypool is exhausted, no script is returned at all.  Catch this.
+        if (!coinbase_script) {
+            throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+        }
+    }
+    else
+    {
+        std::map<CTxDestination, CAmount> balances;
+        {
+            LOCK2(cs_main, pwallet->cs_wallet);
+            balances = pwallet->GetAddressBalances();
+        }
+
+        const CTxDestination* dest = FindAddressForMining(balances, cur_pindex, consensusParams);
+        if (dest == nullptr)
+            throw JSONRPCError(RPC_WALLET_ERROR, "Error: Can't find appropriate address to generate block");
+
+        CBitcoinAddress address = CBitcoinAddress(*dest);
+        if (!address.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Error: Invalid address");
+
+        coinbase_script = std::make_shared<CReserveScript>();
+        coinbase_script->reserveScript = GetScriptForDestination(address.Get());
+    }
+}
+
 UniValue generate(const JSONRPCRequest& request)
 {
     CWallet * const pwallet = GetWalletForJSONRPCRequest(request);
@@ -3173,83 +3217,16 @@ UniValue generate(const JSONRPCRequest& request)
     for (int block_count = 0; block_count < num_generate; block_count++)
     {
         std::shared_ptr<CReserveScript> coinbase_script;
-        const Consensus::Params& consensusParams = Params().GetConsensus();
-        int height = 0;
-        CBlockIndex * cur_pindex;
-        {   // Don't keep cs_main locked
-            LOCK(cs_main);
-            height = chainActive.Height();
-            cur_pindex = chainActive.Tip();
-        }
-        if (!cur_pindex) {
-            throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't get current block");
+        GetScriptForMining(pwallet, coinbase_script);
+
+        //throw an error if no script was provided
+        if (coinbase_script->reserveScript.empty()) {
+            throw JSONRPCError(RPC_INTERNAL_ERROR, "No coinbase script available");
         }
 
-
-        if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
-        {
-            pwallet->GetScriptForMining(coinbase_script);
-
-            // If the keypool is exhausted, no script is returned at all.  Catch this.
-            if (!coinbase_script) {
-                throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-            }
-        }
-        else
-        {
-            // rule1 prepare: get all addresses from last blocks
-            std::vector<std::string> last_blocks_addrs;
-            CBlockIndex * pindex = cur_pindex;
-            for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
-            {
-                CBlock prev_block;
-                if (!ReadBlockFromDisk(prev_block, pindex, consensusParams))
-                    throw JSONRPCError(RPC_INTERNAL_ERROR, "Error: ReadBlockFromDisk failed");
-
-                std::vector<std::string> cur_block_addrs = GetTransactionDestinations(prev_block.vtx[0]);
-                last_blocks_addrs.insert(last_blocks_addrs.end(), cur_block_addrs.begin(), cur_block_addrs.end());
-            }
-
-            // rule2 prepare: find amount threshold
-            double threshold_difficulty = GetDifficultyPrevN(cur_pindex, consensusParams.HardFork4DifficultyPrevBlockCount);
-            std::map<CTxDestination, CAmount> balances;
-            {
-                LOCK2(cs_main, pwallet->cs_wallet);
-                balances = pwallet->GetAddressBalances();
-            }
-            std::map<CTxDestination, CAmount>::iterator it = balances.begin();
-            while (it != balances.end())
-            {
-                CTxDestination addr = it->first;
-                CAmount amount = it->second;
-                std::string addr_str = CBitcoinAddress(addr).ToString();
-
-                if (last_blocks_addrs.end() == std::find(last_blocks_addrs.begin(), last_blocks_addrs.end(), addr_str)  // rule1: check last blocks
-                    && (amount >= consensusParams.HardFork4BalanceThreshold * threshold_difficulty))                    // rule2: check balance
-                {
-                    break;
-                }
-
-                it++;
-            }
-
-            if (it == balances.end())
-                throw JSONRPCError(RPC_WALLET_ERROR, "Error: Can't find appropriate address to generate block");
-
-            CBitcoinAddress address = CBitcoinAddress(it->first);
-            if (!address.IsValid())
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Error: Invalid address");
-
-            coinbase_script = std::make_shared<CReserveScript>();
-            coinbase_script->reserveScript = GetScriptForDestination(address.Get());
-
-            //throw an error if no script was provided
-            if (coinbase_script->reserveScript.empty()) {
-                throw JSONRPCError(RPC_INTERNAL_ERROR, "No coinbase script available");
-            }
-        }
         resultBlockHashes.push_backV(generateBlocks(coinbase_script, 1, max_tries, true).getValues());
     }
+
     return resultBlockHashes;
 }
 
@@ -3304,31 +3281,15 @@ UniValue generatetoaddress(const JSONRPCRequest& request)
 
         if ((height + 1) > consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
         {
-            // check rule1
-            CBlockIndex * pindex = cur_pindex;
-
-            for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
-            {
-                CBlock prev_block;
-                if (!ReadBlockFromDisk(prev_block, pindex, consensusParams))
-                    throw JSONRPCError(RPC_INTERNAL_ERROR, "Error: ReadBlockFromDisk failed");
-
-                std::vector<std::string> cur_block_addrs = GetTransactionDestinations(prev_block.vtx[0]);
-                if (cur_block_addrs.end() != std::find(cur_block_addrs.begin(), cur_block_addrs.end(), addr_str))
-                    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Address get reward not long ago");
-            }
-
-            // check rule2
             std::map<CTxDestination, CAmount> balances;
             {
                 LOCK2(cs_main, pwallet->cs_wallet);
                 balances = pwallet->GetAddressBalances();
             }
 
-            CAmount amount = balances[address.Get()];
-            double rule_difficulty = GetDifficultyPrevN(cur_pindex, consensusParams.HardFork4DifficultyPrevBlockCount);
-            if (amount < consensusParams.HardFork4BalanceThreshold * rule_difficulty)
-                throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Not enough coins on address");
+            std::string errorString;
+            if (!IsValidAddressForMining(address.Get(), balances[address.Get()], cur_pindex, consensusParams, errorString))
+                throw JSONRPCError(RPC_WALLET_ERROR, errorString);
         }
 
         resultBlockHashes.push_backV(generateBlocks(coinbaseScript, 1, nMaxTries, true).getValues());
