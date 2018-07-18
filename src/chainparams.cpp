@@ -85,7 +85,7 @@ public:
         consensus.HardFork2Height = 1711675;
         consensus.HardFork3Height = 1838000;
         consensus.HardFork4Height = 99999999;
-        consensus.HardFork4BalanceThreshold = COIN * 1000;
+        consensus.HardFork4CoinAgePow = 4;
         consensus.HardFork4AddressPrevBlockCount = 60;
         consensus.HardFork4DifficultyPrevBlockCount = 10;
         consensus.HardFork4CheckLastCharsCount = 2;
@@ -192,7 +192,7 @@ public:
         consensus.HardFork2Height = 200;
         consensus.HardFork3Height = 300;
         consensus.HardFork4Height = 400;
-        consensus.HardFork4BalanceThreshold = COIN * 5;
+        consensus.HardFork4CoinAgePow = 2;
         consensus.HardFork4AddressPrevBlockCount = 10;
         consensus.HardFork4DifficultyPrevBlockCount = 10;
         consensus.HardFork4CheckLastCharsCount = 1;
@@ -291,7 +291,7 @@ public:
         consensus.HardFork2Height = -1;
         consensus.HardFork3Height = -1;
         consensus.HardFork4Height = 10;
-        consensus.HardFork4BalanceThreshold = COIN * 1;
+        consensus.HardFork4CoinAgePow = 1;
         consensus.HardFork4AddressPrevBlockCount = 2;
         consensus.HardFork4DifficultyPrevBlockCount = 10;
         consensus.HardFork4CheckLastCharsCount = 1;
