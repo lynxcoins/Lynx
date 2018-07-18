@@ -55,16 +55,20 @@ struct Params {
     int HardFork2Height;
     /** Block number at which the third hard fork (DigiShield) will be performed */
     int HardFork3Height;
-    /** Block number at which the fourth hard fork (pos rules) will be performed */
+    /** Block number at which the fourth hard fork (Rule 1) will be performed */
     int HardFork4Height;
-    /** Power for calculating the minimum balance of the wallet (see pos rule2) */
-    double HardFork4CoinAgePow;
+    /** Block number at which the fourth hard fork (Rule 2) will be performed */
+    int HardFork5Height;
+    /** Block number at which the fourth hard fork (Rule 3) will be performed */
+    int HardFork6Height;
     /** Position of prev block that address must not win block (see rule1) */
     int HardFork4AddressPrevBlockCount;
+    /** Power for calculating the minimum balance of the wallet (see pos rule2) */
+    double HardFork5CoinAgePow;
     /** Position of prev block to get difficulty from (see rule2) */
-    int HardFork4DifficultyPrevBlockCount;
+    int HardFork5DifficultyPrevBlockCount;
     /** Numberof chars to check in address and block hash (see pos rule3) */
-    int HardFork4CheckLastCharsCount;
+    int HardFork6CheckLastCharsCount;
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
