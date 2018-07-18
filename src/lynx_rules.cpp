@@ -12,8 +12,11 @@
 
 CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    double difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
-    double thresholdBalance = std::pow(difficulty, consensusParams.HardFork4CoinAgePow)*COIN;
+    if (pindex->nHeight <= consensusParams.HardFork5Height)
+        return 0;
+
+    double difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork5DifficultyPrevBlockCount);
+    double thresholdBalance = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
     if (std::isinf(thresholdBalance) || thresholdBalance > MAX_MONEY)
         return MAX_MONEY;
     return static_cast<CAmount>(thresholdBalance);
@@ -21,6 +24,9 @@ CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& 
 
 static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::set<std::string>& result)
 {
+    if (pindex->nHeight <= consensusParams.HardFork4Height)
+        return true;
+
     for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
     {
         CBlock block;
@@ -118,7 +124,7 @@ bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Conse
 
 bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    if (pindex->nHeight <= consensusParams.HardFork4Height)
+    if (pindex->nHeight <= consensusParams.HardFork5Height)
         return true; // The rule does not yet apply
 
     // rule2:
@@ -147,7 +153,7 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
 
 bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams)
 {
-    if (nHeight <= consensusParams.HardFork4Height)
+    if (nHeight <= consensusParams.HardFork6Height)
         return true; // The rule does not yet apply
    
     // rule3:
@@ -168,7 +174,7 @@ bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& 
     LogPrintf("Address_hash: %s\n", addrHex);
     LogPrintf("Block hash: %s\n", blockHex);
 
-    auto lastCharsCount = consensusParams.HardFork4CheckLastCharsCount;
+    auto lastCharsCount = consensusParams.HardFork6CheckLastCharsCount;
     bool res = 0 == addrHex.compare(addrHex.size() - lastCharsCount, lastCharsCount,
                                     blockHex, blockHex.size() - lastCharsCount, lastCharsCount);
     if (!res)
