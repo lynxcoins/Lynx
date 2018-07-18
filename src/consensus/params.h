@@ -57,8 +57,8 @@ struct Params {
     int HardFork3Height;
     /** Block number at which the fourth hard fork (pos rules) will be performed */
     int HardFork4Height;
-    /** Minimum address balance threshold (see pos rule2) */
-    CAmount HardFork4BalanceThreshold;
+    /** Power for calculating the minimum balance of the wallet (see pos rule2) */
+    double HardFork4CoinAgePow;
     /** Position of prev block that address must not win block (see rule1) */
     int HardFork4AddressPrevBlockCount;
     /** Position of prev block to get difficulty from (see rule2) */

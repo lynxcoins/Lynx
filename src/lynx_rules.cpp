@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <set>
 #include "consensus/validation.h"
@@ -11,8 +12,11 @@
 
 CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    double thresholdDifficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
-    return static_cast<CAmount>(consensusParams.HardFork4BalanceThreshold * thresholdDifficulty);
+    double difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork4AddressPrevBlockCount);
+    double thresholdBalance = std::pow(difficulty, consensusParams.HardFork4CoinAgePow)*COIN;
+    if (std::isinf(thresholdBalance) || thresholdBalance > MAX_MONEY)
+        return MAX_MONEY;
+    return static_cast<CAmount>(thresholdBalance);
 }
 
 static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::set<std::string>& result)
