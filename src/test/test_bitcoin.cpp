@@ -123,12 +123,6 @@ TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
     for (int i = 0; i < TESTNET_COINBASE_MATURITY; i++)
     {
         std::vector<CMutableTransaction> noTxns;
-        if (i > 0)
-        {
-            CKey tmpKey;
-            tmpKey.MakeNewKey(true);
-            scriptPubKey = CScript() <<  ToByteVector(tmpKey.GetPubKey()) << OP_CHECKSIG;
-        }
         CBlock b = CreateAndProcessBlock(noTxns, scriptPubKey);
         coinbaseTxns.push_back(*b.vtx[0]);
     }
