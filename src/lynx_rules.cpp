@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <vector>
 #include <set>
@@ -19,7 +20,7 @@ CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& 
     double thresholdBalance = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
     if (std::isinf(thresholdBalance) || thresholdBalance > MAX_MONEY)
         return MAX_MONEY;
-    return static_cast<CAmount>(thresholdBalance);
+    return std::max(static_cast<CAmount>(thresholdBalance), consensusParams.HardFork5LowerLimitMinBalance);
 }
 
 static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::set<std::string>& result)

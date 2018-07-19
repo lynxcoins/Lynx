@@ -67,6 +67,8 @@ struct Params {
     double HardFork5CoinAgePow;
     /** Position of prev block to get difficulty from (see rule2) */
     int HardFork5DifficultyPrevBlockCount;
+    /** The lower limit of the minimum balance of the address */
+    CAmount HardFork5LowerLimitMinBalance;
     /** Numberof chars to check in address and block hash (see pos rule3) */
     int HardFork6CheckLastCharsCount;
     /**
