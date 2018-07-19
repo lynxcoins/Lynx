@@ -91,6 +91,7 @@ public:
         consensus.HardFork5CoinAgePow = 4;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
         consensus.HardFork5LowerLimitMinBalance = 1000*COIN;
+        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
         consensus.HardFork6CheckLastCharsCount = 2;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 1 * 60 * 60; // KittehCoin: retarget every 1 hours
@@ -201,6 +202,7 @@ public:
         consensus.HardFork5DifficultyPrevBlockCount = 10;
         consensus.HardFork5CoinAgePow = 2;
         consensus.HardFork5LowerLimitMinBalance = 1*COIN;
+        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
         consensus.HardFork6CheckLastCharsCount = 1;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 1 * 60 * 60; // // KittehCoin: retarget every 1 hours
@@ -303,6 +305,7 @@ public:
         consensus.HardFork5CoinAgePow = 1;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
         consensus.HardFork5LowerLimitMinBalance = 1*COIN;
+        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
         consensus.HardFork6CheckLastCharsCount = 1;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // two weeks

@@ -69,6 +69,8 @@ struct Params {
     int HardFork5DifficultyPrevBlockCount;
     /** The lower limit of the minimum balance of the address */
     CAmount HardFork5LowerLimitMinBalance;
+    /** The upper limit of the minimum balance of the address */
+    CAmount HardFork5UpperLimitMinBalance;
     /** Numberof chars to check in address and block hash (see pos rule3) */
     int HardFork6CheckLastCharsCount;
     /**
