@@ -18,8 +18,8 @@ CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& 
 
     double difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork5DifficultyPrevBlockCount);
     double thresholdBalance = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
-    if (std::isinf(thresholdBalance) || thresholdBalance > MAX_MONEY)
-        return MAX_MONEY;
+    if (std::isinf(thresholdBalance) || thresholdBalance > consensusParams.HardFork5UpperLimitMinBalance)
+        return consensusParams.HardFork5UpperLimitMinBalance;
     return std::max(static_cast<CAmount>(thresholdBalance), consensusParams.HardFork5LowerLimitMinBalance);
 }
 
