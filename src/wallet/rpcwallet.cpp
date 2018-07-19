@@ -3140,7 +3140,7 @@ UniValue bumpfee(const JSONRPCRequest& request)
     return result;
 }
 
-void GetScriptForMining(CWallet * const pwallet, std::shared_ptr<CReserveScript> coinbase_script)
+void GetScriptForMining(CWallet * const pwallet, std::shared_ptr<CReserveScript>& coinbase_script)
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
     
