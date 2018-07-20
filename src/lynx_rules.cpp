@@ -11,23 +11,24 @@
 #include "lynx_rules.h"
 
 
-CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams)
+CAmount GetMinBalanceForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams)
 {
-    if (pindex->nHeight <= consensusParams.HardFork5Height)
+    if (pBestBlockIndex->nHeight < consensusParams.HardFork5Height)
         return 0;
 
-    double difficulty = GetDifficultyPrevN(pindex, consensusParams.HardFork5DifficultyPrevBlockCount);
-    double thresholdBalance = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
-    if (std::isinf(thresholdBalance) || thresholdBalance > consensusParams.HardFork5UpperLimitMinBalance)
+    double difficulty = GetDifficultyPrevN(pBestBlockIndex, consensusParams.HardFork5DifficultyPrevBlockCount);
+    double minBalanceForMining = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
+    if (std::isinf(minBalanceForMining) || minBalanceForMining > consensusParams.HardFork5UpperLimitMinBalance)
         return consensusParams.HardFork5UpperLimitMinBalance;
-    return std::max(static_cast<CAmount>(thresholdBalance), consensusParams.HardFork5LowerLimitMinBalance);
+    return std::max(static_cast<CAmount>(minBalanceForMining), consensusParams.HardFork5LowerLimitMinBalance);
 }
 
-static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::set<std::string>& result)
+bool GetAddressesProhibitedForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::set<std::string>& result)
 {
-    if (pindex->nHeight <= consensusParams.HardFork4Height)
+    if (pBestBlockIndex->nHeight < consensusParams.HardFork4Height)
         return true;
 
+    const CBlockIndex* pindex = pBestBlockIndex;
     for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
     {
         CBlock block;
@@ -41,15 +42,15 @@ static bool GetLastCoinbaseDestinations(const CBlockIndex* pindex, const Consens
     return true;
 }
 
-const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
+const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams)
 {
     // rule1 prepare: get all addresses from last blocks
-    std::set<std::string> lastCoinbaseDestinations;
-    if (!GetLastCoinbaseDestinations(pindex, consensusParams, lastCoinbaseDestinations))
+    std::set<std::string> addressesProhibitedForMining;
+    if (!GetAddressesProhibitedForMining(pBestBlockIndex, consensusParams, addressesProhibitedForMining))
         return nullptr;
 
     // rule2 prepare: find amount threshold
-    CAmount thresholdBalance = GetThresholdBalance(pindex, consensusParams);
+    CAmount minBalanceForMining = GetMinBalanceForMining(pBestBlockIndex, consensusParams);
     
     // Find address
     auto it  = balances.begin();
@@ -59,8 +60,8 @@ const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmoun
         CAmount amount = it->second;
         std::string strAddr = CBitcoinAddress(addr).ToString();
 
-        if (lastCoinbaseDestinations.count(strAddr) == 0  // rule1: check last blocks
-            && amount >= thresholdBalance)                // rule2: check balance
+        if (addressesProhibitedForMining.count(strAddr) == 0 // rule1: check last blocks
+            && amount >= minBalanceForMining)                // rule2: check balance
         {
             return &addr;
         }
@@ -69,24 +70,24 @@ const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmoun
     return nullptr;
 }
 
-bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::string& errorString)
+bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::string& errorString)
 {
     // rule1:
-    std::set<std::string> lastDestinations;
-    if (!GetLastCoinbaseDestinations(pindex, consensusParams, lastDestinations))
+    std::set<std::string> addressesProhibitedForMining;
+    if (!GetAddressesProhibitedForMining(pBestBlockIndex, consensusParams, addressesProhibitedForMining))
     {
         errorString = "Unable to get the latest Coinbase addresses";
         return false;
     }
 
-    if (lastDestinations.count(CBitcoinAddress(address).ToString()) != 0)
+    if (addressesProhibitedForMining.count(CBitcoinAddress(address).ToString()) != 0)
     {
         errorString = "Address get reward not long ago";
         return false;
     }
 
     // rule2:
-    if (balance < GetThresholdBalance(pindex, consensusParams))
+    if (balance < GetMinBalanceForMining(pBestBlockIndex, consensusParams))
     {
         errorString = "Not enough coins on address";
         return false;
@@ -142,11 +143,13 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
         LOCK(cs_main);
         balance = pcoinsTip->GetAddressBalance(addr);
     }
-    CAmount thresholdBalance = GetThresholdBalance(pindex, consensusParams);
-    if (balance < thresholdBalance)
+
+    CBlockIndex* prevIndex = pindex->pprev; // Use the block that was the best at the time of our block's mining
+    CAmount minBalanceForMining = GetMinBalanceForMining(prevIndex, consensusParams);
+    if (balance < minBalanceForMining)
     {
-        return error("CheckLynxRule2(): not enough coins on address %s: balance=%i, thresholdBalance=%i",
-            coinbaseDestinations[0], balance, thresholdBalance);
+        return error("CheckLynxRule2(): not enough coins on address %s: balance=%i, minBalanceForMining=%i",
+            coinbaseDestinations[0], balance, minBalanceForMining);
     }
 
     return true;
