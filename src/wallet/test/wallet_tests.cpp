@@ -646,10 +646,10 @@ BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)
     auto list = wallet->ListCoins();
     BOOST_CHECK_EQUAL(list.size(), 1);
     BOOST_CHECK_EQUAL(boost::get<CKeyID>(list.begin()->first).ToString(), coinbaseAddress);
-    BOOST_CHECK_EQUAL(list.begin()->second.size(), 1);
+    BOOST_CHECK_EQUAL(list.begin()->second.size(), 29);
 
     // Check initial balance from one mature coinbase transaction.
-    BOOST_CHECK_EQUAL(1 * COIN, wallet->GetAvailableBalance());
+    BOOST_CHECK_EQUAL(29 * COIN, wallet->GetAvailableBalance());
 
     // Add a transaction creating a change address, and confirm ListCoins still
     // returns the coin associated with the change address underneath the
@@ -659,12 +659,12 @@ BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)
     list = wallet->ListCoins();
     BOOST_CHECK_EQUAL(list.size(), 1);
     BOOST_CHECK_EQUAL(boost::get<CKeyID>(list.begin()->first).ToString(), coinbaseAddress);
-    BOOST_CHECK_EQUAL(list.begin()->second.size(), 2);
+    BOOST_CHECK_EQUAL(list.begin()->second.size(), 30);
 
     // Lock both coins. Confirm number of available coins drops to 0.
     std::vector<COutput> available;
     wallet->AvailableCoins(available);
-    BOOST_CHECK_EQUAL(available.size(), 2);
+    BOOST_CHECK_EQUAL(available.size(), 30);
     for (const auto& group : list) {
         for (const auto& coin : group.second) {
             wallet->LockCoin(COutPoint(coin.tx->GetHash(), coin.i));
@@ -678,7 +678,7 @@ BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)
     list = wallet->ListCoins();
     BOOST_CHECK_EQUAL(list.size(), 1);
     BOOST_CHECK_EQUAL(boost::get<CKeyID>(list.begin()->first).ToString(), coinbaseAddress);
-    BOOST_CHECK_EQUAL(list.begin()->second.size(), 2);
+    BOOST_CHECK_EQUAL(list.begin()->second.size(), 30);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
