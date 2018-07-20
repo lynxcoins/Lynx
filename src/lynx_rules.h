@@ -12,10 +12,11 @@
 class CBlock;
 class CBlockIndex;
 
-CAmount GetThresholdBalance(const CBlockIndex* pindex, const Consensus::Params& consensusParams);
+CAmount GetMinBalanceForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams);
+bool GetAddressesProhibitedForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::set<std::string>& result);
 
-const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
-bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pindex, const Consensus::Params& consensusParams, std::string& errorString);
+const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams);
+bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::string& errorString);
 
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
