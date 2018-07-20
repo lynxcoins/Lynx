@@ -132,7 +132,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
 
         const Consensus::Params& consensusParams = Params().GetConsensus();
         // chainActive.Height() is current height, +1 - height of the new block
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && (!CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensusParams) || !CheckLynxRule3(pblock, nHeight, consensusParams))) {
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && (!CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensusParams) || !CheckLynxRule3(pblock, nHeight + 1, consensusParams))) {
             ++pblock->nNonce;
             --nMaxTries;
         }
