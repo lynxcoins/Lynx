@@ -133,22 +133,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xc2adb964220f170f6c4fe9002f0db19a6f9c9608f6f765ba0629ac3897028de5"));
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.emplace_back("seed00.getlynx.io", false);
-        vSeeds.emplace_back("seed01.getlynx.io", false);
-        vSeeds.emplace_back("seed02.getlynx.io", false);
-        vSeeds.emplace_back("seed03.getlynx.io", false);
-        vSeeds.emplace_back("seed04.getlynx.io", false);
-        vSeeds.emplace_back("seed05.getlynx.io", false);
-        vSeeds.emplace_back("seed06.getlynx.io", false);
-        vSeeds.emplace_back("seed07.getlynx.io", false);
-        vSeeds.emplace_back("seed08.getlynx.io", false);
-        vSeeds.emplace_back("seed09.getlynx.io", false);
-        vSeeds.emplace_back("seed10.getlynx.io", false);
-        vSeeds.emplace_back("seed11.getlynx.io", false);
-        vSeeds.emplace_back("seed12.getlynx.io", false);
-        vSeeds.emplace_back("seed13.getlynx.io", false);
-        vSeeds.emplace_back("seed14.getlynx.io", false);
-        vSeeds.emplace_back("seed15.getlynx.io", false);
+        vSeeds.emplace_back("blendedhealing.com", false);
+        vSeeds.emplace_back("blendedhealing.net", false);
+        vSeeds.emplace_back("blendedhealing.org", false);
 
         //vSeeds.emplace_back("seed-a.litecoin.loshan.co.uk", true);
         //vSeeds.emplace_back("dnsseed.thrasher.io", true);
