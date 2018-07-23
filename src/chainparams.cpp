@@ -209,8 +209,8 @@ public:
         consensus.HardFork2Height = 200;
         consensus.HardFork3Height = 300;
         consensus.HardFork4Height = 400;
-        consensus.HardFork5Height = 400;
-        consensus.HardFork6Height = 400;
+        consensus.HardFork5Height = 500;
+        consensus.HardFork6Height = 600;
         consensus.HardFork4AddressPrevBlockCount = 10;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
         consensus.HardFork5CoinAgePow = 2;
@@ -311,9 +311,9 @@ public:
         consensus.HardForkHeight = -1;
         consensus.HardFork2Height = -1;
         consensus.HardFork3Height = -1;
-        consensus.HardFork4Height = 100;
-        consensus.HardFork5Height = 100;
-        consensus.HardFork6Height = 100;
+        consensus.HardFork4Height = 105;
+        consensus.HardFork5Height = 110;
+        consensus.HardFork6Height = 115;
         consensus.HardFork4AddressPrevBlockCount = 2;
         consensus.HardFork5CoinAgePow = 1;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
@@ -326,7 +326,7 @@ public:
         consensus.PowTargetSpacingV2 = 60;
         consensus.PowTargetSpacingV3 = 60;
         consensus.CoinbaseMaturity = REGTEST_COINBASE_MATURITY;
-        consensus.CoinbaseMaturity2 = REGTEST_COINBASE_MATURITY;;
+        consensus.CoinbaseMaturity2 = REGTEST_COINBASE_MATURITY;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
