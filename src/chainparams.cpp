@@ -298,9 +298,9 @@ public:
         consensus.HardForkHeight = -1;
         consensus.HardFork2Height = -1;
         consensus.HardFork3Height = -1;
-        consensus.HardFork4Height = 105;
-        consensus.HardFork5Height = 110;
-        consensus.HardFork6Height = 115;
+        consensus.HardFork4Height = 35;
+        consensus.HardFork5Height = 40;
+        consensus.HardFork6Height = 45;
         consensus.HardFork4AddressPrevBlockCount = 2;
         consensus.HardFork5CoinAgePow = 1;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
