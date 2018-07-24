@@ -30,13 +30,27 @@ static CBlock CreateBlock(const std::vector<CMutableTransaction>& txns, const CS
     return block;
 }
 
-CBlockIndex* GetDifficultyBlockIndex()
+static CBlockIndex* GetDifficultyBlockIndex()
 {
     const auto& consensusParams = Params().GetConsensus();
     CBlockIndex* difficultyBlockIndex = chainActive.Tip();
     for (int i = 0; i < consensusParams.HardFork5DifficultyPrevBlockCount; ++i)
         difficultyBlockIndex = difficultyBlockIndex->pprev;
     return difficultyBlockIndex;
+}
+
+static std::string sha256(const std::string& str)
+{
+    unsigned char rawHash[CSHA256::OUTPUT_SIZE];
+    CSHA256()
+        .Write(reinterpret_cast<const unsigned char*>(str.data()), str.size())
+        .Finalize(rawHash);
+    return HexStr(rawHash, rawHash + CSHA256::OUTPUT_SIZE);
+}
+
+static std::string sha256(const CTxDestination& dest)
+{
+    return sha256(CBitcoinAddress(dest).ToString());
 }
 
 
@@ -225,7 +239,7 @@ BOOST_AUTO_TEST_CASE(lunx_rule2)
         std::map<CTxDestination, CAmount> balances = {
             {address, pcoinsTip->GetAddressBalance(CBitcoinAddress(address).ToString())},
             {address2, pcoinsTip->GetAddressBalance(CBitcoinAddress(address2).ToString())},
-            {address3, pcoinsTip->GetAddressBalance(CBitcoinAddress(address2).ToString())}
+            {address3, pcoinsTip->GetAddressBalance(CBitcoinAddress(address3).ToString())}
         };
 
         const CTxDestination* addressForMining = FindAddressForMining(balances, chainActive.Tip(), consensusParams);
@@ -235,6 +249,60 @@ BOOST_AUTO_TEST_CASE(lunx_rule2)
         auto oldChainHeight = chainActive.Height();
         CreateAndProcessBlock({}, GetScriptForDestination(*addressForMining));
         BOOST_CHECK(chainActive.Height() == oldChainHeight + 1);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(lunx_rule3)
+{
+    const auto& consensusParams = Params().GetConsensus();
+    const CTxDestination address = coinbaseKey.GetPubKey().GetID();
+    const CTxDestination address2 = coinbaseKey2.GetPubKey().GetID();
+    const CTxDestination address3 = coinbaseKey3.GetPubKey().GetID();
+
+    // Let's check that the rules are still inactive
+    while (chainActive.Height() < consensusParams.HardFork6Height)
+    {
+        std::map<CTxDestination, CAmount> balances = {
+            {address, pcoinsTip->GetAddressBalance(CBitcoinAddress(address).ToString())},
+            {address2, pcoinsTip->GetAddressBalance(CBitcoinAddress(address2).ToString())},
+            {address3, pcoinsTip->GetAddressBalance(CBitcoinAddress(address3).ToString())}
+        };
+        const CTxDestination* addressForMining = FindAddressForMining(balances, chainActive.Tip(), consensusParams);
+        BOOST_CHECK(addressForMining != nullptr);
+
+        // Each generated block must be successfully added to the chain
+        auto oldChainHeight = chainActive.Height();
+        CreateAndProcessBlock({}, GetScriptForDestination(*addressForMining));
+        BOOST_CHECK(chainActive.Height() > oldChainHeight);
+    }
+
+    // Let's check that the rule works
+    while (chainActive.Height() < consensusParams.HardFork6Height + 1)
+    {
+        std::map<CTxDestination, CAmount> balances = {
+            {address, pcoinsTip->GetAddressBalance(CBitcoinAddress(address).ToString())},
+            {address2, pcoinsTip->GetAddressBalance(CBitcoinAddress(address2).ToString())},
+            {address3, pcoinsTip->GetAddressBalance(CBitcoinAddress(address3).ToString())}
+        };
+        const CTxDestination* addressForMining = FindAddressForMining(balances, chainActive.Tip(), consensusParams);
+        BOOST_CHECK(addressForMining != nullptr);
+
+        auto oldChainHeight = chainActive.Height();
+        CBlock block = CreateAndProcessBlock({}, GetScriptForDestination(*addressForMining));
+        auto blockHash = block.GetHash().ToString();
+        auto blockHashLastChars = blockHash.substr(blockHash.size() - consensusParams.HardFork6CheckLastCharsCount);
+        auto addressHash = sha256(*addressForMining);
+        auto addressHashLastChars = addressHash.substr(addressHash.size() - consensusParams.HardFork6CheckLastCharsCount);
+        if (chainActive.Height() > oldChainHeight)
+        {
+            // The block was added to the chain, making sure that the HASH is correct
+            BOOST_CHECK(blockHashLastChars == addressHashLastChars);
+        }
+        else
+        {
+            // The block was not added to the chain, HASH should be incorrect
+            BOOST_CHECK(blockHashLastChars != addressHashLastChars);
+        }
     }
 }
 
