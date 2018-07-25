@@ -250,7 +250,7 @@ public:
         vFixedSeeds.clear();
         vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.push_back(CDNSSeedData("logware.us", "logware.us"));
+        vSeeds.push_back(CDNSSeedData("logware.us", false));
         //vSeeds.emplace_back("testnet-seed.litecointools.com", true);
         //vSeeds.emplace_back("seed-b.litecoin.loshan.co.uk", true);
         //vSeeds.emplace_back("dnsseed-testnet.thrasher.io", true);
