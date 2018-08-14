@@ -170,7 +170,8 @@ BITCOIN_CORE_H = \
   zmq/zmqconfig.h\
   zmq/zmqnotificationinterface.h \
   zmq/zmqpublishnotifier.h \
-  lynx_rules.h
+  lynx_rules.h \
+  cpulimiter.h
 
 
 obj/build.h: FORCE
@@ -355,6 +356,7 @@ libbitcoin_util_a_SOURCES = \
   utilmoneystr.cpp \
   utilstrencodings.cpp \
   utiltime.cpp \
+  cpulimiter.cpp \
   $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
