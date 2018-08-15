@@ -22,4 +22,6 @@ std::string HelpRequiringPassphrase(CWallet *);
 void EnsureWalletIsUnlocked(CWallet *);
 bool EnsureWalletIsAvailable(CWallet *, bool avoidException);
 
+void GetScriptForMining(CWallet * const pwallet, std::shared_ptr<CReserveScript>& coinbase_script);
+
 #endif //BITCOIN_WALLET_RPCWALLET_H

@@ -171,7 +171,8 @@ BITCOIN_CORE_H = \
   zmq/zmqnotificationinterface.h \
   zmq/zmqpublishnotifier.h \
   lynx_rules.h \
-  cpulimiter.h
+  cpulimiter.h \
+  builtin_miner.h
 
 
 obj/build.h: FORCE
@@ -332,6 +333,7 @@ libbitcoin_common_a_SOURCES = \
   script/sign.cpp \
   script/standard.cpp \
   warnings.cpp \
+  builtin_miner.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
