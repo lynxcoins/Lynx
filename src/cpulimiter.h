@@ -23,6 +23,8 @@ public:
 
     void suspendMe();
 
+    void stop();
+
 public:
     static int cpuCount();
 
