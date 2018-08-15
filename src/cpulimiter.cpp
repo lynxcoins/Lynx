@@ -78,13 +78,7 @@ CCpuLimiter::CCpuLimiter(double limit) :
 
 CCpuLimiter::~CCpuLimiter()
 {
-    {
-        std::lock_guard<std::mutex> lock(this->mutex);
-        this->exitFlag = true;
-        this->exitCV.notify_one();
-    }
-
-    watcher.join();
+    this->stop();
 }
 
 bool CCpuLimiter::contains(const std::thread& th) const
@@ -119,6 +113,18 @@ void CCpuLimiter::suspendMe()
         while (this->suspendFlag)
             this->resumeCV.wait(lock);
     }
+}
+
+void CCpuLimiter::stop()
+{
+    {
+        std::lock_guard<std::mutex> lock(this->mutex);
+        this->exitFlag = true;
+        this->exitCV.notify_one();
+    }
+
+    if (watcher.joinable())
+        watcher.join();
 }
 
 int CCpuLimiter::cpuCount()
