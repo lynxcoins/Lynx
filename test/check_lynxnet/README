@@ -1,7 +1,7 @@
 This is a tool for checking new rules in blockchain.
 
 Dependencies:
-    python3 python3-bitcoin
+    python3 python3-bitcoinlib
 
 Change fields (host, port, user, pass) in corresponding config and then run one
 of these command depending on type of your net:
