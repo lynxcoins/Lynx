@@ -69,6 +69,7 @@ BOOST_AUTO_TEST_CASE(set_cpu_limit)
 BOOST_AUTO_TEST_CASE(mining)
 {
     enableWallet();
+    BuiltinMiner::setCheckSynckChainFlag(false);
     BuiltinMiner::start();
 
     int baseHeight = chainActive.Height();
