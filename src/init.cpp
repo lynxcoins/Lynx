@@ -46,6 +46,7 @@
 #include "wallet/wallet.h"
 #endif
 #include "warnings.h"
+#include "builtin_miner.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <memory>
@@ -187,6 +188,7 @@ void Shutdown()
     RenameThread("bitcoin-shutoff");
     mempool.AddTransactionsUpdated(1);
 
+    BuiltinMiner::stop();
     StopHTTPRPC();
     StopREST();
     StopRPC();
@@ -525,6 +527,7 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-rpcworkqueue=<n>", strprintf("Set the depth of the work queue to service RPC calls (default: %d)", DEFAULT_HTTP_WORKQUEUE));
         strUsage += HelpMessageOpt("-rpcservertimeout=<n>", strprintf("Timeout during HTTP requests (default: %d)", DEFAULT_HTTP_SERVER_TIMEOUT));
     }
+    strUsage += BuiltinMiner::getHelpString();
 
     return strUsage;
 }
@@ -1739,6 +1742,9 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
         pwallet->postInitProcess(scheduler);
     }
 #endif
+
+    if (!BuiltinMiner::appInit(gArgs))
+        return false;
 
     return !fRequestShutdown;
 }

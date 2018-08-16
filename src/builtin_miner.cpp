@@ -142,7 +142,7 @@ void BuiltinMiner::setCpuLimit(double limit)
     if (running)
         throw std::runtime_error("Unable to update built-in miner settings: the built-in miner is active");
     cpuLimit = limit;
-    LogPrintf("A new cpuLimit value for BuiltinMiner has been set: %lf", cpuLimit);
+    LogPrintf("A new cpuLimit value for BuiltinMiner has been set: %1.2lf\n", cpuLimit);
 }
 
 double BuiltinMiner::getCpuLimit()
@@ -161,9 +161,9 @@ void BuiltinMiner::setCheckSynckChainFlag(bool flag)
 
     checkSynckChain = flag;
     if (checkSynckChain)
-        LogPrintf("Mining without network synchronization is prohibited.");
+        LogPrintf("Mining without network synchronization is prohibited\n");
     else
-        LogPrintf("Mining without network synchronization is allowed.");
+        LogPrintf("Mining without network synchronization is allowed\n");
 }
 
 bool BuiltinMiner::getCheckSynckChainFlag()
@@ -181,7 +181,7 @@ void BuiltinMiner::start()
     try
     {
         doStart();
-        LogPrintf("Builtin miner started");
+        LogPrintf("Builtin miner started\n");
 
     }
     catch (...)
@@ -197,7 +197,7 @@ void BuiltinMiner::stop()
     if (running)
     {
         doStop();
-        LogPrintf("Builtin miner stopped");
+        LogPrintf("Builtin miner stopped\n");
     }
 }
 
@@ -218,7 +218,7 @@ bool BuiltinMiner::appInit(ArgsManager& args)
 
     if (getWallet() == nullptr)
     {
-        LogPrintf("Built-in miner is disabled due to the fact that the wallet is disabled!");
+        LogPrintf("Built-in miner is disabled due to the fact that the wallet is disabled!\n");
         return true;
     }
 
@@ -249,5 +249,5 @@ std::string BuiltinMiner::getHelpString()
 {
     return HelpMessageGroup(_("Built-in miner options:"))
         + HelpMessageOpt("-disablebuiltinminer", _("Disables the built-in miner"))
-        + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %lf)"), DefaultCpuLimit));
+        + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %1.2lf)"), DefaultCpuLimit));
 }
