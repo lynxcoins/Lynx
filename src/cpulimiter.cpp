@@ -68,8 +68,8 @@ CCpuLimiter::LimitedThread::LimitedThread(std::thread& th) :
 CCpuLimiter::CCpuLimiter(double limit) :
     limit(limit)
 {
-    assert(limit > 0);
-    assert(limit < 1);
+    assert(limit >= 0);
+    assert(limit <= 1);
 
     this->watcher = std::thread([this]() {
         this->main();

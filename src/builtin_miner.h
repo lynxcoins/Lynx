@@ -1,7 +1,11 @@
 #ifndef BITCOIN_BUILTIN_MINER_H
 #define BITCOIN_BUILTIN_MINER_H
 
+#include <string>
 #include "cpulimiter.h"
+
+
+class ArgsManager;
 
 namespace BuiltinMiner
 {
@@ -16,6 +20,9 @@ namespace BuiltinMiner
     void start();
     void stop();
     bool isRunning();
+
+    bool appInit(ArgsManager& args);
+    std::string getHelpString();
 };
 
 #endif // BITCOIN_BUILTIN_MINER_H
