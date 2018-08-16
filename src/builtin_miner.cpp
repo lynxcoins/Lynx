@@ -7,11 +7,13 @@
 #include "chain.h"
 #include "chainparams.h"
 #include "cpulimiter.h"
+#include "tinyformat.h"
+#include "ui_interface.h"
 #include "univalue.h"
 #include "util.h"
 #include "validation.h"
-#include "wallet/wallet.h"
 
+#include "wallet/wallet.h"
 #include "wallet/rpcwallet.h"
 #include "rpc/mining.h"
 
@@ -20,8 +22,12 @@
 
 namespace
 {
+    using tfm::format; 
+
+    const double DefaultCpuLimit = 0.05;
+
     std::mutex mutex;
-    double cpuLimit = 0.05;
+    double cpuLimit = DefaultCpuLimit;
     bool running = false;
     std::list<std::thread> workThreads;
     std::unique_ptr<CCpuLimiter> cpuLimiter;
@@ -131,7 +137,7 @@ namespace
 void BuiltinMiner::setCpuLimit(double limit)
 {
     std::lock_guard<std::mutex> lock(mutex);
-    if (limit <= 0 || limit >= 1)
+    if (limit < 0 || limit > 1)
         throw std::runtime_error("Unable to set cpulimit: cpulimit must be greater than 0, but less than 1");
     if (running)
         throw std::runtime_error("Unable to update built-in miner settings: the built-in miner is active");
@@ -199,4 +205,49 @@ bool BuiltinMiner::isRunning()
 {
     std::lock_guard<std::mutex> lock(mutex);
     return running;
+}
+
+
+bool BuiltinMiner::appInit(ArgsManager& args)
+{
+    if (args.GetBoolArg("-disablebuiltinminer", false))
+    {
+        LogPrintf("Built-in miner disabled!\n");
+        return true;
+    }
+
+    if (getWallet() == nullptr)
+    {
+        LogPrintf("Built-in miner is disabled due to the fact that the wallet is disabled!");
+        return true;
+    }
+
+    try
+    {
+        auto strCpuLimit = args.GetArg("-cpulimitforbuiltinminer", std::to_string(DefaultCpuLimit));
+        auto cpuLimit = std::stod(strCpuLimit);
+        setCpuLimit(cpuLimit);
+    }
+    catch (const std::exception& e)
+    {
+        return InitError("-cpulimitforbuiltinminer is invalid");
+    }
+
+    try
+    {
+        start();
+    }
+    catch (const std::exception& e)
+    {
+        return InitError(e.what());
+    }
+
+    return true;
+}
+
+std::string BuiltinMiner::getHelpString()
+{
+    return HelpMessageGroup(_("Built-in miner options:"))
+        + HelpMessageOpt("-disablebuiltinminer", _("Disables the built-in miner"))
+        + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %lf)"), DefaultCpuLimit));
 }
