@@ -26,6 +26,7 @@ namespace
     std::list<std::thread> workThreads;
     std::unique_ptr<CCpuLimiter> cpuLimiter;
     CWallet* wallet = nullptr;
+    bool checkSynckChain = true;
 
     bool getScriptForMining(std::shared_ptr<CReserveScript>& script, int& nHeight)
     {
@@ -75,6 +76,9 @@ namespace
         while (running)
         {
             cpuLimiter->suspendMe();
+
+            if (checkSynckChain && IsInitialBlockDownload())
+                continue;
             
             if (!getScriptForMining(script, nHeight))
                 continue;
@@ -130,7 +134,7 @@ void BuiltinMiner::setCpuLimit(double limit)
     if (limit <= 0 || limit >= 1)
         throw std::runtime_error("Unable to set cpulimit: cpulimit must be greater than 0, but less than 1");
     if (running)
-        throw std::runtime_error("Unable to set cpulimit: the built-in miner is active");
+        throw std::runtime_error("Unable to update built-in miner settings: the built-in miner is active");
     cpuLimit = limit;
     LogPrintf("A new cpuLimit value for BuiltinMiner has been set: %lf", cpuLimit);
 }
@@ -139,6 +143,27 @@ double BuiltinMiner::getCpuLimit()
 {
     std::lock_guard<std::mutex> lock(mutex);
     return cpuLimit;
+}
+
+void BuiltinMiner::setCheckSynckChainFlag(bool flag)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    if (running)
+        throw std::runtime_error("Unable to update built-in miner settings: the built-in miner is active");
+    if (flag == checkSynckChain)
+        return;
+
+    checkSynckChain = flag;
+    if (checkSynckChain)
+        LogPrintf("Mining without network synchronization is prohibited.");
+    else
+        LogPrintf("Mining without network synchronization is allowed.");
+}
+
+bool BuiltinMiner::getCheckSynckChainFlag()
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    return checkSynckChain;
 }
 
 void BuiltinMiner::start()
@@ -150,6 +175,8 @@ void BuiltinMiner::start()
     try
     {
         doStart();
+        LogPrintf("Builtin miner started");
+
     }
     catch (...)
     {
@@ -162,7 +189,10 @@ void BuiltinMiner::stop()
 {
     std::lock_guard<std::mutex> lock(mutex);
     if (running)
+    {
         doStop();
+        LogPrintf("Builtin miner stopped");
+    }
 }
 
 bool BuiltinMiner::isRunning()
