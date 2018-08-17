@@ -133,10 +133,11 @@ BOOST_AUTO_TEST_CASE(app_init)
         swap(tmpThreadSafeMessageBox, uiInterface.ThreadSafeMessageBox);
 
         {
-            auto args = parse({"program", "-cpulimitforbuiltinminer=0.5"});
+            auto args = parse({"program", "-cpulimitforbuiltinminer=0.5", "-disablechecksyncchain"});
             BOOST_CHECK(BuiltinMiner::appInit(*args));
             BOOST_CHECK(BuiltinMiner::isRunning());
             BOOST_CHECK_EQUAL(BuiltinMiner::getCpuLimit(), 0.5);
+            BOOST_CHECK_EQUAL(BuiltinMiner::getCheckSynckChainFlag(), false);
             BuiltinMiner::stop();
         }
     }
