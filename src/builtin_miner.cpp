@@ -7,6 +7,9 @@
 #include "chain.h"
 #include "chainparams.h"
 #include "cpulimiter.h"
+#include "lynx_rules.h"
+#include "miner.h"
+#include "pow.h"
 #include "tinyformat.h"
 #include "ui_interface.h"
 #include "univalue.h"
@@ -60,36 +63,61 @@ namespace
 #endif
     }
 
-    void generateBlock(std::shared_ptr<CReserveScript>& script)
+    void generateBlock(std::shared_ptr<CReserveScript>& script, int nHeight)
     {
-        uint64_t nMaxTries = 0x10000;
-        try
+        const int nInnerLoopCount = 0x10000;
+        auto& params = Params();
+        auto& consensus = params.GetConsensus();
+
+        auto pblocktemplate = BlockAssembler(params)
+            .CreateNewBlock(script->reserveScript);
+        if (pblocktemplate == nullptr)
+            return;
+
+        unsigned int nExtraNonce = 0;
+        CBlock* pblock = &pblocktemplate->block;
         {
-            generateBlocks(script, 1, nMaxTries, true);
+            LOCK(cs_main);
+            IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
-        catch (const UniValue&)
+
+        for (; running && pblock->nNonce < nInnerLoopCount; ++pblock->nNonce)
         {
+            bool isValidBlock = CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensus)
+                && CheckLynxRule3(pblock, nHeight + 1, consensus);
+            if (isValidBlock)
+            {
+                auto shared_pblock = std::make_shared<const CBlock>(*pblock);
+                if (ProcessNewBlock(params, shared_pblock, true, nullptr))
+                    script->KeepScript();
+                return;
+            }
+
+            cpuLimiter->suspendMe();
+        }
+    }
+
+    void waitForSyncChain()
+    {
+        if (checkSynckChain)
+        {
+            while (running && IsInitialBlockDownload())
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 
     void generateBlocks()
     {
+        waitForSyncChain();
+
         int nHeight = -1;
-        std::shared_ptr<CReserveScript> script;
-        
-        auto& params = Params();
-        auto& consensus = params.GetConsensus();
+        std::shared_ptr<CReserveScript> script;        
         while (running)
         {
-            cpuLimiter->suspendMe();
-
-            if (checkSynckChain && IsInitialBlockDownload())
-                continue;
-            
+            cpuLimiter->suspendMe();            
             if (!getScriptForMining(script, nHeight))
                 continue;
-
-            generateBlock(script);
+            generateBlock(script, nHeight);
         }
     }
 
@@ -181,7 +209,7 @@ void BuiltinMiner::start()
     try
     {
         doStart();
-        LogPrintf("Builtin miner started\n");
+        LogPrintf("BuiltinMiner started\n");
 
     }
     catch (...)
@@ -197,7 +225,7 @@ void BuiltinMiner::stop()
     if (running)
     {
         doStop();
-        LogPrintf("Builtin miner stopped\n");
+        LogPrintf("BuiltinMiner stopped\n");
     }
 }
 
@@ -212,13 +240,13 @@ bool BuiltinMiner::appInit(ArgsManager& args)
 {
     if (args.GetBoolArg("-disablebuiltinminer", false))
     {
-        LogPrintf("Built-in miner disabled!\n");
+        LogPrintf("BuiltinMiner disabled!\n");
         return true;
     }
 
     if (getWallet() == nullptr)
     {
-        LogPrintf("Built-in miner is disabled due to the fact that the wallet is disabled!\n");
+        LogPrintf("BuiltinMiner is disabled due to the fact that the wallet is disabled!\n");
         return true;
     }
 
