@@ -1,3 +1,4 @@
+#include <chrono>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -28,6 +29,7 @@ namespace
     using tfm::format; 
 
     const double DefaultCpuLimit = 0.05;
+    const auto TimeoutForCheckSynckChain = std::chrono::milliseconds(200);
 
     std::mutex mutex;
     double cpuLimit = DefaultCpuLimit;
@@ -102,7 +104,7 @@ namespace
         if (checkSynckChain)
         {
             while (running && IsInitialBlockDownload())
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::this_thread::sleep_for(TimeoutForCheckSynckChain);
         }
     }
 
@@ -250,6 +252,9 @@ bool BuiltinMiner::appInit(ArgsManager& args)
         return true;
     }
 
+    if (args.GetBoolArg("-disablechecksyncchain", false))
+        setCheckSynckChainFlag(false);
+
     try
     {
         auto strCpuLimit = args.GetArg("-cpulimitforbuiltinminer", std::to_string(DefaultCpuLimit));
@@ -277,5 +282,6 @@ std::string BuiltinMiner::getHelpString()
 {
     return HelpMessageGroup(_("Built-in miner options:"))
         + HelpMessageOpt("-disablebuiltinminer", _("Disables the built-in miner"))
-        + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %1.2lf)"), DefaultCpuLimit));
+        + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %1.2lf)"), DefaultCpuLimit))
+        + HelpMessageOpt("-disablechecksyncchain", _("Causes the built-in miner to immediately start working, without waiting for the end of the synchronization of the chain"));
 }
