@@ -36,6 +36,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "validation.h"
+#include "builtinminerstatus.h"
 
 #include <iostream>
 
@@ -209,6 +210,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
     if(enableWallet)
     {
         frameBlocksLayout->addStretch();
+        frameBlocksLayout->addWidget(new BuilinMinerStatus);
         frameBlocksLayout->addWidget(unitDisplayControl);
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(labelWalletEncryptionIcon);
