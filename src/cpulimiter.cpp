@@ -108,8 +108,11 @@ void CCpuLimiter::suspendMe()
 {
     if (this->suspendFlag)
     {
-        std::unique_lock<std::mutex> lock(this->mutex);    
-        assert(this->checkContainsWithoutLock(std::this_thread::get_id()));
+        std::unique_lock<std::mutex> lock(this->mutex);
+        // FIXME: Return back assert
+        // The problem is caused by the fact that the thread itself can not add itself to CCpuLimiter,
+        // and it can not be suspended either.
+        // assert(this->checkContainsWithoutLock(std::this_thread::get_id()));
         while (this->suspendFlag)
             this->resumeCV.wait(lock);
     }
