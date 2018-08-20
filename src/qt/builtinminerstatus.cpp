@@ -3,7 +3,7 @@
 #include "builtin_miner.h"
 #include "builtinminerstatus.h"
 
-BuilinMinerStatus::BuilinMinerStatus(QWidget* parent) : QLabel(parent)
+BuiltinMinerStatus::BuiltinMinerStatus(QWidget* parent) : QLabel(parent)
 {
     auto updateTimer = new QTimer(this);
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateStatus()));
@@ -12,23 +12,43 @@ BuilinMinerStatus::BuilinMinerStatus(QWidget* parent) : QLabel(parent)
     updateStatus();
 }
 
-BuilinMinerStatus::~BuilinMinerStatus()
+BuiltinMinerStatus::~BuiltinMinerStatus()
 {
 }
 
-void BuilinMinerStatus::updateStatus()
+void BuiltinMinerStatus::setRunningIcon(const QPixmap& pixmap)
+{
+    runningIcon = pixmap;
+}
+
+void BuiltinMinerStatus::setStoppedIcon(const QPixmap& pixmap)
+{
+    stoppedIcon = pixmap;
+}
+
+void BuiltinMinerStatus::updateStatus()
 {
     QString status;
+    QString action;
     if (BuiltinMiner::isRunning())
+    {
+        setPixmap(runningIcon);
         status = tr("running");
+        action = tr("stop");
+    }
     else
+    {
         status = tr("stopped");
+        action = tr("start");
+        setPixmap(stoppedIcon);
+    }
 
-    QString newText = tr("The built-in miner is %1").arg(status);
-    setText(newText);
+    QString newToolTip = tr("The built-in miner is %1. Click to %2 the miner.")
+        .arg(status, action);
+    setToolTip(newToolTip);
 }
 
-void BuilinMinerStatus::mouseReleaseEvent(QMouseEvent *event)
+void BuiltinMinerStatus::mouseReleaseEvent(QMouseEvent *event)
 {
     if (BuiltinMiner::isRunning())
         BuiltinMiner::stop();
