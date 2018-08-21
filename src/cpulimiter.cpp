@@ -8,6 +8,8 @@
 
 #ifdef WIN32
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <mach/thread_act.h>
 #endif
 
 #include "cpulimiter.h"
@@ -42,6 +44,16 @@ namespace
                 + (static_cast<int64_t>(userTime.dwHighDateTime) << 32)
                 + (static_cast<int64_t>(kernetTime.dwHighDateTime) << 32);
         res = nanoseconds(totalTime * 100);
+        return true;
+#elif defined(__APPLE__)
+        auto port = pthread_mach_thread_np(thread);
+        thread_basic_info info;
+        mach_msg_type_number_t count = THREAD_BASIC_INFO_COUNT;
+        if (thread_info(port, THREAD_BASIC_INFO, (thread_info_t)&info, &count) != KERN_SUCCESS)
+            return false;
+
+        res = seconds(info.user_time.seconds) + microseconds(info.user_time.microseconds)
+            + seconds(info.system_time.seconds) + microseconds(info.system_time.microseconds);
         return true;
 #else
         clockid_t clock;

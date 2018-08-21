@@ -55,10 +55,10 @@ private:
 
     mutable std::mutex mutex;
     std::condition_variable exitCV;
-    bool exitFlag = false;
+    volatile bool exitFlag = false;
 
     std::condition_variable resumeCV;
-    bool suspendFlag = false;
+    volatile bool suspendFlag = false;
 
     std::thread watcher;
     LimitedThreads limitedThreads;
