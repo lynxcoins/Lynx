@@ -195,10 +195,10 @@ public:
         consensus.HardForkHeight = 100;
         consensus.HardFork2Height = 200;
         consensus.HardFork3Height = 300;
-        consensus.HardFork4Height = 400;
-        consensus.HardFork5Height = 500;
-        consensus.HardFork6Height = 600;
-        consensus.HardFork4AddressPrevBlockCount = 10;
+        consensus.HardFork4Height = 2000;
+        consensus.HardFork5Height = 2500;
+        consensus.HardFork6Height = 3000;
+        consensus.HardFork4AddressPrevBlockCount = 30;
         consensus.HardFork5DifficultyPrevBlockCount = 10;
         consensus.HardFork5CoinAgePow = 2;
         consensus.HardFork5LowerLimitMinBalance = 1*COIN;
