@@ -5,6 +5,7 @@ from bitcoin.core import COIN
 import hashlib
 import binascii
 unhexlify = binascii.unhexlify
+hexlify = binascii.hexlify
 import sys
 
 
@@ -156,6 +157,10 @@ def print_all_balances(cur_blockn):
         print(address, total / COIN)
 
 
+rule1_errors = 0
+rule2_errors = 0
+rule3_errors = 0
+
 print("checking blocks...")
 block_count = proxy.getblockcount()
 for blockn in range(0, block_count + 1):
@@ -175,10 +180,14 @@ for blockn in range(0, block_count + 1):
     # check rule1
     if blockn > params.HardFork4Height:
         cur_addrs = set(block_reward_addresses[-1])
+        got_errors = False
         for i in range(max(blockn - params.HardFork4AddressPrevBlockCount, 0), blockn):
             prev_addrs = set(block_reward_addresses[i])
             if not cur_addrs.isdisjoint(prev_addrs):
                 print("Error! Block %d RULE 1! address %s were met in block %d" % (blockn, cur_addrs.intersection(prev_addrs).pop(), i))
+                got_errors = True
+        if got_errors:
+            rule1_errors = rule1_errors + 1
 
     # check rule2
     if blockn > params.HardFork5Height:
@@ -196,13 +205,15 @@ for blockn in range(0, block_count + 1):
 
         if balance < minBalanceForMining:
             print("Error! Block %d RULE 2! Not enough coins for mining on adrress %s. Got %d, required %d" % (blockn, block_reward_addresses[-1][0], (balance+0.0) / COIN, (minBalanceForMining+0.0 )/ COIN))
+            rule2_errors = rule2_errors + 1
 
     # check rule3
     if blockn > params.HardFork6Height:
         addr_hash = hashlib.sha256(str(block_reward_addresses[-1][0]).encode('utf-8')).hexdigest()
-        block_hash = bhash[::-1].hex()
+        block_hash = hexlify(bhash[::-1]).decode()
         if addr_hash[-params.HardFork6CheckLastCharsCount:] != block_hash[-params.HardFork6CheckLastCharsCount:]:
             print("Error! Block %d RULE 3! Address hash %s and block hash %s don't end on the same %d chars" % (blockn, addr_hash, block_hash, params.HardFork6CheckLastCharsCount))
+            rule3_errors = rule3_errors + 1
 
     # parse block transactions
     for t in block.vtx:
@@ -231,4 +242,14 @@ for blockn in range(0, block_count + 1):
                     # print("***TO: ", address, vout.nValue / COIN)
 
 print("Done!")
+
+print("Results:")
+print("rule1 errors: %d" % rule1_errors)
+print("rule2 errors: %d" % rule2_errors)
+print("rule3 errors: %d" % rule3_errors)
+print("--------------------")
+print("total errors: %d" % (rule1_errors + rule2_errors + rule3_errors))
+print("total blocks: %d" % block_count)
+
 # print_all_balances(blockn)
+
