@@ -1,0 +1,17 @@
+This is a tool for checking new rules in blockchain.
+
+Dependencies:
+    python3 python3-bitcoinlib
+
+To install all dependencies run these:
+$ apt-get install python3
+$ apt-get install python3-pip
+$ pip3 install python-bitcoinlib
+
+
+Change fields (host, port, user, pass) in corresponding config and then run one
+of these command depending on type of your net:
+
+./check_lynxnet.py ./mainnet.lynx.conf mainnet
+./check_lynxnet.py ./testnet.lynx.conf testnet
+./check_lynxnet.py ./regtest.lynx.conf regtest
