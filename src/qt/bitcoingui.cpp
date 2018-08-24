@@ -36,6 +36,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "validation.h"
+#include "builtinminerstatus.h"
 
 #include <iostream>
 
@@ -209,6 +210,10 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
     if(enableWallet)
     {
         frameBlocksLayout->addStretch();
+        auto builtinMinerStatus = new BuiltinMinerStatus();
+        builtinMinerStatus->setRunningIcon(platformStyle->SingleColorIcon(":/icons/mining_running").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        builtinMinerStatus->setStoppedIcon(platformStyle->SingleColorIcon(":/icons/mining_stopped").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        frameBlocksLayout->addWidget(builtinMinerStatus);
         frameBlocksLayout->addWidget(unitDisplayControl);
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(labelWalletEncryptionIcon);
@@ -249,7 +254,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
     // Subscribe to notifications from core
     subscribeToCoreSignals();
 
-    connect(connectionsControl, SIGNAL(clicked(QPoint)), this, SLOT(toggleNetworkActive()));
+    connect(connectionsControl, SIGNAL(clicked(QPoint)), this, SLOT(togglekActive()));
 
     modalOverlay = new ModalOverlay(this->centralWidget());
 #ifdef ENABLE_WALLET
