@@ -107,23 +107,21 @@ bool FindAddressForMiningFromCandidates(std::vector<std::string>& address_candid
     return false;
 }
 
-bool FindFirstValidAddressForMining(std::vector<std::string>& address_candidates, CBitcoinAddress& address)
+bool GetRandomValidAddressForMining(std::vector<std::string>& address_candidates, CBitcoinAddress& address)
 {
-    // Find address
-    for (auto strAddr = address_candidates.begin(); strAddr != address_candidates.end(); ++strAddr)
-    {
-        CBitcoinAddress cur_address(*strAddr);
-        if (!cur_address.IsValid())
-        {
-            LogPrintf("Mining address %s is invalid\n", strAddr->c_str());
-            continue;
-        }
+    if (address_candidates.empty())
+        return false;
 
-        address = cur_address;
-        return true;
+    int randomIndex = rand() % address_candidates.size();
+    CBitcoinAddress cur_address(address_candidates[randomIndex]);
+    if (!cur_address.IsValid())
+    {
+        LogPrintf("Mining address %s is invalid\n", address_candidates[randomIndex].c_str());
+        return false;
     }
 
-    return false;
+    address = cur_address;
+    return true;
 }
 
 bool GetScriptForMiningFromCandidates(std::vector<std::string>& address_candidates, std::shared_ptr<CReserveScript>& coinbase_script)
@@ -145,7 +143,7 @@ bool GetScriptForMiningFromCandidates(std::vector<std::string>& address_candidat
 
     if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
     {
-        found = FindFirstValidAddressForMining(address_candidates, address);
+        found = GetRandomValidAddressForMining(address_candidates, address);
     }
     else
     {
