@@ -104,6 +104,10 @@ namespace
         {
             std::vector<std::string> address_candidates;
             boost::split(address_candidates, mineraddress_cfg, boost::is_any_of(",\t "));
+            // remove empty values from list after spliting
+            address_candidates.erase(std::remove_if(address_candidates.begin(), address_candidates.end(), [](std::string const& s) {return s.empty();}),
+                                     address_candidates.end());
+
             if (!GetScriptForMiningFromCandidates(address_candidates, script))
                 return false;
 
@@ -325,5 +329,6 @@ std::string BuiltinMiner::getHelpString()
     return HelpMessageGroup(_("Built-in miner options:"))
         + HelpMessageOpt("-disablebuiltinminer", _("Disables the built-in miner"))
         + HelpMessageOpt("-cpulimitforbuiltinminer=<0..1>", format(_("CPU limit for built-in miner (default: %1.2lf)"), DefaultCpuLimit))
-        + HelpMessageOpt("-disablechecksyncchain", _("Causes the built-in miner to immediately start working, without waiting for the end of the synchronization of the chain"));
+        + HelpMessageOpt("-disablechecksyncchain", _("Causes the built-in miner to immediately start working, without waiting for the end of the synchronization of the chain"))
+        + HelpMessageOpt("-mineraddress", _("Addresses which will be used for mining if wallet is disable. Addresses whould be separated by \",\""));
 }
