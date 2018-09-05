@@ -29,7 +29,7 @@ namespace
 {
     using tfm::format; 
 
-    const double DefaultCpuLimit = 0.05;
+    const double DefaultCpuLimit = 0.01;
     const auto TimeoutForCheckSynckChain = std::chrono::milliseconds(200);
     const int ReloadConfigInterval = 120; // seconds
 
