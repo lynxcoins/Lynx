@@ -22,7 +22,8 @@
 #include "rpc/mining.h"
 
 #include "builtin_miner.h"
-
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options/detail/config_file.hpp>
 
 namespace
 {
@@ -30,6 +31,7 @@ namespace
 
     const double DefaultCpuLimit = 0.05;
     const auto TimeoutForCheckSynckChain = std::chrono::milliseconds(200);
+    const int ReloadConfigInterval = 120; // seconds
 
     std::mutex mutex;
     double cpuLimit = DefaultCpuLimit;
@@ -39,9 +41,28 @@ namespace
     CWallet* wallet = nullptr;
     bool checkSynckChain = true;
 
+    void UpdateMiningAddressesFromConf()
+    {
+        std::string confPath = gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME);
+        fs::ifstream streamConfig(GetConfigFile(confPath));
+        if (!streamConfig.good())
+            return; // No bitcoin.conf file is OK
+
+        std::set<std::string> setOptions;
+        setOptions.insert("*");
+        for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it)
+        {
+            std::string strKey = std::string("-") + it->string_key;
+            std::string strValue = it->value[0];
+            if ((strKey == "-mineraddress") && (!strValue.empty()))
+            {
+                gArgs.ForceSetArg(strKey, strValue);
+            }
+        }
+    }
+
     bool getScriptForMining(std::shared_ptr<CReserveScript>& script, int& nHeight)
     {
-#ifdef ENABLE_WALLET
         int newHeight;
         {
             LOCK(cs_main);
@@ -50,6 +71,7 @@ namespace
         if (newHeight == nHeight && script != nullptr)
             return true;
 
+#ifdef ENABLE_WALLET
         try
         {
             GetScriptForMining(wallet, script);
@@ -61,7 +83,33 @@ namespace
             return false;
         }
 #else
-    return false;
+        std::string mineraddress_cfg = gArgs.GetArg("-mineraddress", std::string());
+        if (mineraddress_cfg.empty())
+        {
+            // loop here is to be able to stop faster if "running" has changed
+            for (int i = 0; running && i < ReloadConfigInterval; i++)
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+            try
+            {
+                UpdateMiningAddressesFromConf();
+                LogPrintf("Built-in miner reloaded config file\n");
+            } catch (const std::exception& e) {
+                fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+            }
+
+            return false;
+        }
+        else
+        {
+            std::vector<std::string> address_candidates;
+            boost::split(address_candidates, mineraddress_cfg, boost::is_any_of(",\t "));
+            if (!GetScriptForMiningFromCandidates(address_candidates, script))
+                return false;
+
+            nHeight = newHeight;
+            return true;
+        }
 #endif
     }
 
@@ -138,7 +186,7 @@ namespace
     {
         wallet = getWallet();
         if (wallet == nullptr)
-            throw std::runtime_error("Unable to start the built-in miner: wallet is disabled");
+            LogPrintf("Built-in miner uses -mineraddress option because wallet is disabled\n");
 
         running = true;
         cpuLimiter.reset(new CCpuLimiter(cpuLimit));
@@ -243,12 +291,6 @@ bool BuiltinMiner::appInit(ArgsManager& args)
     if (args.GetBoolArg("-disablebuiltinminer", false))
     {
         LogPrintf("BuiltinMiner disabled!\n");
-        return true;
-    }
-
-    if (getWallet() == nullptr)
-    {
-        LogPrintf("BuiltinMiner is disabled due to the fact that the wallet is disabled!\n");
         return true;
     }
 
