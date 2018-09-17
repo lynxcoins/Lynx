@@ -30,8 +30,8 @@ namespace
     using tfm::format; 
 
     const double DefaultCpuLimit = 0.01;
-    const auto TimeoutForCheckSynckChain = std::chrono::milliseconds(200);
-    const int ReloadConfigInterval = 120; // seconds
+    const auto Timeout = std::chrono::milliseconds(200);
+    const auto ReloadConfigInterval = std::chrono::seconds(120);
 
     std::mutex mutex;
     double cpuLimit = DefaultCpuLimit;
@@ -41,7 +41,7 @@ namespace
     CWallet* wallet = nullptr;
     bool checkSynckChain = true;
 
-    void UpdateMiningAddressesFromConf()
+    void updateMiningAddressesFromConf()
     {
         auto confPath = gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME);
 
@@ -51,6 +51,72 @@ namespace
         auto mineraddress = tmpArgs.GetArg("-mineraddress", std::string());
         if (!mineraddress.empty())
             gArgs.ForceSetArg("-mineraddress", mineraddress);
+    }
+
+    bool useWallet()
+    {
+#ifndef ENABLE_WALLET
+        return false;
+#endif
+        return wallet != nullptr;
+    }
+
+    std::shared_ptr<CReserveScript> getScriptForMiningFromWallet()
+    {
+        std::shared_ptr<CReserveScript> script;
+        try
+        {
+            GetScriptForMining(wallet, script);
+        }
+        catch (const UniValue&)
+        {
+            script.reset();
+        }
+        return script;
+    }
+
+    void sleepBeforeUpdatingMiningAddressesFromConf()
+    {
+        // loop here is to be able to stop faster if "running" has changed
+        for (int i = 0; running && i < static_cast<int>(ReloadConfigInterval / Timeout); i++)
+            std::this_thread::sleep_for(Timeout);
+    }
+
+    std::vector<std::string> getMinerAddresses()
+    {
+        std::string mineraddress_cfg = gArgs.GetArg("-mineraddress", std::string());
+        std::vector<std::string> addresses;
+        boost::split(addresses, mineraddress_cfg, boost::is_any_of(",\t "));
+        auto new_end = std::remove_if(addresses.begin(), addresses.end(),
+                                      std::mem_fn(&std::string::empty));
+        addresses.erase(new_end, addresses.end());
+
+        return addresses;
+    }
+
+    std::shared_ptr<CReserveScript> getScriptForMiningFromConfig()
+    {
+        std::vector<std::string> address_candidates = getMinerAddresses();
+        if (address_candidates.empty())
+        {
+            // Only update the addresses for mining, script will be returned on the next call
+            try
+            {
+                sleepBeforeUpdatingMiningAddressesFromConf();
+                updateMiningAddressesFromConf();
+                LogPrintf("Built-in miner reloaded config file\n");
+            }
+            catch (const std::exception& e)
+            {
+                fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+            }
+            return nullptr;
+        }
+
+        std::shared_ptr<CReserveScript> script;
+        if (!GetScriptForMiningFromCandidates(address_candidates, script))
+            return nullptr;
+        return script;
     }
 
     bool getScriptForMining(std::shared_ptr<CReserveScript>& script, int& nHeight)
@@ -63,50 +129,16 @@ namespace
         if (newHeight == nHeight && script != nullptr)
             return true;
 
-#ifdef ENABLE_WALLET
-        try
-        {
-            GetScriptForMining(wallet, script);
-            nHeight = newHeight;
-            return script != nullptr;
-        }
-        catch (const UniValue&)
-        {
-            return false;
-        }
-#else
-        std::string mineraddress_cfg = gArgs.GetArg("-mineraddress", std::string());
-        if (mineraddress_cfg.empty())
-        {
-            // loop here is to be able to stop faster if "running" has changed
-            for (int i = 0; running && i < ReloadConfigInterval; i++)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-            try
-            {
-                UpdateMiningAddressesFromConf();
-                LogPrintf("Built-in miner reloaded config file\n");
-            } catch (const std::exception& e) {
-                fprintf(stderr,"Error reading configuration file: %s\n", e.what());
-            }
-
-            return false;
-        }
+        if (useWallet())
+            script = getScriptForMiningFromWallet();
         else
-        {
-            std::vector<std::string> address_candidates;
-            boost::split(address_candidates, mineraddress_cfg, boost::is_any_of(",\t "));
-            // remove empty values from list after spliting
-            address_candidates.erase(std::remove_if(address_candidates.begin(), address_candidates.end(), [](std::string const& s) {return s.empty();}),
-                                     address_candidates.end());
+            script = getScriptForMiningFromConfig();
 
-            if (!GetScriptForMiningFromCandidates(address_candidates, script))
-                return false;
-
-            nHeight = newHeight;
-            return true;
-        }
-#endif
+        if (script == nullptr)
+            return false;
+        
+        nHeight = newHeight;
+        return true;
     }
 
     void generateBlock(std::shared_ptr<CReserveScript>& script, int nHeight)
@@ -148,7 +180,7 @@ namespace
         if (checkSynckChain)
         {
             while (running && IsInitialBlockDownload())
-                std::this_thread::sleep_for(TimeoutForCheckSynckChain);
+                std::this_thread::sleep_for(Timeout);
         }
     }
 
