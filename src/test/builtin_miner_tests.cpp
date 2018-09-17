@@ -54,9 +54,6 @@ BOOST_FIXTURE_TEST_SUITE(builtin_miner_test, BuiltinMinerTestingSetup)
 BOOST_AUTO_TEST_CASE(start_stop)
 {
     BOOST_CHECK_EQUAL(BuiltinMiner::isRunning(), false);
-    
-    // Wallet disabled
-    BOOST_CHECK_THROW(BuiltinMiner::start(), std::runtime_error);
 
     enableWallet();
 
@@ -90,14 +87,6 @@ BOOST_AUTO_TEST_CASE(app_init)
         enableWallet();
 
         auto args = parse({"program", "-disablebuiltinminer"});
-        BOOST_CHECK(BuiltinMiner::appInit(*args));
-        BOOST_CHECK(!BuiltinMiner::isRunning());
-    }
-
-    {
-        disableWallet();
-
-        auto args = parse({"program"});
         BOOST_CHECK(BuiltinMiner::appInit(*args));
         BOOST_CHECK(!BuiltinMiner::isRunning());
     }
