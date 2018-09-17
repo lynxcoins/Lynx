@@ -14,7 +14,7 @@ class CBlockIndex;
 
 CAmount GetMinBalanceForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams);
 bool GetAddressesProhibitedForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::set<std::string>& result);
-bool GetScriptForMiningFromCandidates(std::vector<std::string>& address_candidates, std::shared_ptr<CReserveScript>& coinbase_script);
+bool GetScriptForMiningFromCandidates(const std::vector<std::string>& address_candidates, std::shared_ptr<CReserveScript>& coinbase_script);
 
 const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams);
 bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::string& errorString);
