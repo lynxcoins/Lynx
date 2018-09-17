@@ -43,22 +43,14 @@ namespace
 
     void UpdateMiningAddressesFromConf()
     {
-        std::string confPath = gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME);
-        fs::ifstream streamConfig(GetConfigFile(confPath));
-        if (!streamConfig.good())
-            return; // No bitcoin.conf file is OK
+        auto confPath = gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME);
 
-        std::set<std::string> setOptions;
-        setOptions.insert("*");
-        for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it)
-        {
-            std::string strKey = std::string("-") + it->string_key;
-            std::string strValue = it->value[0];
-            if ((strKey == "-mineraddress") && (!strValue.empty()))
-            {
-                gArgs.ForceSetArg(strKey, strValue);
-            }
-        }
+        ArgsManager tmpArgs;
+        tmpArgs.ReadConfigFile(confPath);
+
+        auto mineraddress = tmpArgs.GetArg("-mineraddress", std::string());
+        if (!mineraddress.empty())
+            gArgs.ForceSetArg("-mineraddress", mineraddress);
     }
 
     bool getScriptForMining(std::shared_ptr<CReserveScript>& script, int& nHeight)
