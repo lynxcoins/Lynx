@@ -277,9 +277,9 @@ CAmount CCoinsViewCache::GetAddressBalance(std::string address)
                         if (s.compare(address) == 0)
                             balance += coin.out.nValue;
 
-                        std::ostringstream oss;
-                        oss << "UTXO1 addr " << s << ": " << std::setw(30) << coin.out.nValue << "\n";
-                        LogPrintf(oss.str().c_str());
+                        //std::ostringstream oss;
+                        //oss << "UTXO1 addr " << s << ": " << std::setw(30) << coin.out.nValue << "\n";
+                        //LogPrintf(oss.str().c_str());
                     }
                 }
             }
