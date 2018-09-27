@@ -70,6 +70,94 @@ const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmoun
     return nullptr;
 }
 
+static bool FindAddressForMiningFromCandidates(const std::vector<std::string>& address_candidates, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, CBitcoinAddress& address)
+{
+    // rule1 prepare: get all addresses from last blocks
+    std::set<std::string> addressesProhibitedForMining;
+    if (!GetAddressesProhibitedForMining(pBestBlockIndex, consensusParams, addressesProhibitedForMining))
+        return false;
+
+    // rule2 prepare: find amount threshold
+    CAmount minBalanceForMining = GetMinBalanceForMining(pBestBlockIndex, consensusParams);
+
+    // Find address
+    for (auto strAddr = address_candidates.begin(); strAddr != address_candidates.end(); ++strAddr)
+    {
+        CBitcoinAddress cur_address(*strAddr);
+        if (!cur_address.IsValid())
+        {
+            LogPrintf("Mining address %s is invalid\n", strAddr->c_str());
+            continue;
+        }
+
+        CAmount balance;
+        {
+            LOCK(cs_main);
+            balance = pcoinsTip->GetAddressBalance(*strAddr);
+        }
+
+        if (addressesProhibitedForMining.count(*strAddr) == 0 // rule1: check last blocks
+            && balance >= minBalanceForMining)                // rule2: check balance
+        {
+            address = cur_address;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool GetRandomValidAddressForMining(const std::vector<std::string>& address_candidates, CBitcoinAddress& address)
+{
+    if (address_candidates.empty())
+        return false;
+
+    auto randomIndex = static_cast<size_t>(rand()) % address_candidates.size();
+    CBitcoinAddress cur_address(address_candidates[randomIndex]);
+    if (!cur_address.IsValid())
+    {
+        LogPrintf("Mining address %s is invalid\n", address_candidates[randomIndex].c_str());
+        return false;
+    }
+
+    address = cur_address;
+    return true;
+}
+
+bool GetScriptForMiningFromCandidates(const std::vector<std::string>& address_candidates, std::shared_ptr<CReserveScript>& coinbase_script)
+{
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+    CBitcoinAddress address;
+    bool found = false;
+
+    int height = 0;
+    CBlockIndex * cur_pindex;
+    {   // Don't keep cs_main locked
+        LOCK(cs_main);
+        height = chainActive.Height();
+        cur_pindex = chainActive.Tip();
+    }
+    if (!cur_pindex) {
+        return error("Can't get current block");
+    }
+
+    if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
+    {
+        found = GetRandomValidAddressForMining(address_candidates, address);
+    }
+    else
+    {
+        found = FindAddressForMiningFromCandidates(address_candidates, cur_pindex, consensusParams, address);
+    }
+
+    if (!found)
+        return false;
+
+    coinbase_script = std::make_shared<CReserveScript>();
+    coinbase_script->reserveScript = GetScriptForDestination(address.Get());
+    return true;
+}
+
 bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::string& errorString)
 {
     // rule1:
