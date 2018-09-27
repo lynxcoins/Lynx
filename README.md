@@ -1,7 +1,4 @@
-Lynx Core
-=====================================
-
-[https://getlynx.io](https://getlynx.io)
+# [Lynx](https://getlynx.io) Cryptocurrency Core
 
 ## What is Lynx?
 
@@ -29,8 +26,7 @@ Lynx is a cryptocurrency from the past re-designed for the future. We designed L
 
 ## License
 
-Lynx Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
-information or see https://opensource.org/licenses/MIT.
+Lynx Core is released under the terms of the MIT license. See [COPYING](COPYING) for more information or see https://opensource.org/licenses/MIT.
 
 ## Development Process
 
