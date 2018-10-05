@@ -21,7 +21,7 @@ bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, con
 
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
-bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams);
+bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams, bool from_builtin_miner = false);
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
 

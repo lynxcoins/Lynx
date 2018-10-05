@@ -32,6 +32,7 @@ namespace
     const double DefaultCpuLimit = 0.01;
     const auto Timeout = std::chrono::milliseconds(200);
     const auto ReloadConfigInterval = std::chrono::seconds(120);
+    const auto Log_Speed_interval_sec = 5;
 
     std::mutex mutex;
     double cpuLimit = DefaultCpuLimit;
@@ -40,6 +41,7 @@ namespace
     std::unique_ptr<CCpuLimiter> cpuLimiter;
     CWallet* wallet = nullptr;
     bool checkSynckChain = true;
+    std::atomic<int> hash_counter{0};
 
     void updateMiningAddressesFromConf()
     {
@@ -104,11 +106,11 @@ namespace
             {
                 sleepBeforeUpdatingMiningAddressesFromConf();
                 updateMiningAddressesFromConf();
-                LogPrintf("Built-in miner reloaded config file\n");
+                LogPrint(BCLog::MINER, "BuiltinMiner: Reloaded config file\n");
             }
             catch (const std::exception& e)
             {
-                fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+                LogPrint(BCLog::MINER, "BuiltinMiner: Error reading configuration file: %s\n", e.what());
             }
             return nullptr;
         }
@@ -161,16 +163,21 @@ namespace
 
         for (; running && pblock->nNonce < nInnerLoopCount; ++pblock->nNonce)
         {
-            bool isValidBlock = CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensus)
-                && CheckLynxRule3(pblock, nHeight + 1, consensus);
-            if (isValidBlock)
+            hash_counter++; // atomic counter
+            bool isValidPOW = CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, consensus);
+            if (isValidPOW)
             {
-                auto shared_pblock = std::make_shared<const CBlock>(*pblock);
-                if (ProcessNewBlock(params, shared_pblock, true, nullptr))
-                    script->KeepScript();
-                return;
-            }
+                LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block found, block hash %s\n", pblock->GetHash().ToString());
 
+                bool isValidRule3 = CheckLynxRule3(pblock, nHeight + 1, consensus, true);
+                if (isValidRule3)
+                {
+                    auto shared_pblock = std::make_shared<const CBlock>(*pblock);
+                    if (ProcessNewBlock(params, shared_pblock, true, nullptr))
+                        script->KeepScript();
+                    return;
+                }
+            }
             cpuLimiter->suspendMe();
         }
     }
@@ -189,13 +196,29 @@ namespace
         waitForSyncChain();
 
         int nHeight = -1;
-        std::shared_ptr<CReserveScript> script;        
+        std::shared_ptr<CReserveScript> script;
         while (running)
         {
             cpuLimiter->suspendMe();            
             if (!getScriptForMining(script, nHeight))
+            {
+                LogPrint(BCLog::MINER, "BuiltinMiner: Can't get appropriate address for mining. Sleeping for 30sec...\n");
+                std::this_thread::sleep_for(std::chrono::seconds(30));
                 continue;
+            }
             generateBlock(script, nHeight);
+        }
+    }
+
+    void logMiningSpeed()
+    {
+        auto log_interval = std::chrono::seconds(Log_Speed_interval_sec);
+        hash_counter = 0; // atomic
+        while (running)
+        {
+            std::this_thread::sleep_for(log_interval);
+            float speed = float(hash_counter.exchange(0)) / 1000 / Log_Speed_interval_sec;
+            LogPrint(BCLog::MINER, "BuiltinMiner: Mining speed %0.4f kH/s\n", speed);
         }
     }
 
@@ -214,7 +237,7 @@ namespace
     {
         wallet = getWallet();
         if (wallet == nullptr)
-            LogPrintf("Built-in miner uses -mineraddress option because wallet is disabled\n");
+            LogPrint(BCLog::MINER, "BuiltinMiner: Built-in miner uses -mineraddress option because wallet is disabled\n");
 
         running = true;
         cpuLimiter.reset(new CCpuLimiter(cpuLimit));
@@ -223,13 +246,17 @@ namespace
         {
             workThreads.emplace_back(&generateBlocks);
             cpuLimiter->add(workThreads.back());
+            // delay here is to ensure that we mine different blocks in threads
+            // at least nTime block field will be different
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+        workThreads.emplace_back(&logMiningSpeed);
     }
 
     void doStop()
     {
         running = false;
-        
+
         if (cpuLimiter != nullptr)
             cpuLimiter->stop();        
         for (auto it = workThreads.begin(); it != workThreads.end(); ++it)
@@ -248,7 +275,7 @@ void BuiltinMiner::setCpuLimit(double limit)
     if (running)
         throw std::runtime_error("Unable to update built-in miner settings: the built-in miner is active");
     cpuLimit = limit;
-    LogPrintf("A new cpuLimit value for BuiltinMiner has been set: %1.2lf\n", cpuLimit);
+    LogPrint(BCLog::MINER, "BuiltinMiner: A new cpuLimit value for BuiltinMiner has been set: %1.2lf\n", cpuLimit);
 }
 
 double BuiltinMiner::getCpuLimit()
@@ -267,9 +294,9 @@ void BuiltinMiner::setCheckSynckChainFlag(bool flag)
 
     checkSynckChain = flag;
     if (checkSynckChain)
-        LogPrintf("Mining without network synchronization is prohibited\n");
+        LogPrint(BCLog::MINER, "BuiltinMiner: Mining without network synchronization is prohibited\n");
     else
-        LogPrintf("Mining without network synchronization is allowed\n");
+        LogPrint(BCLog::MINER, "BuiltinMiner: Mining without network synchronization is allowed\n");
 }
 
 bool BuiltinMiner::getCheckSynckChainFlag()
@@ -287,7 +314,7 @@ void BuiltinMiner::start()
     try
     {
         doStart();
-        LogPrintf("BuiltinMiner started\n");
+        LogPrint(BCLog::MINER, "BuiltinMiner: Started\n");
 
     }
     catch (...)
@@ -303,7 +330,7 @@ void BuiltinMiner::stop()
     if (running)
     {
         doStop();
-        LogPrintf("BuiltinMiner stopped\n");
+        LogPrint(BCLog::MINER, "BuiltinMiner: Stopped\n");
     }
 }
 
@@ -318,7 +345,7 @@ bool BuiltinMiner::appInit(ArgsManager& args)
 {
     if (args.GetBoolArg("-disablebuiltinminer", false))
     {
-        LogPrintf("BuiltinMiner disabled!\n");
+        LogPrint(BCLog::MINER, "BuiltinMiner: Disabled!\n");
         return true;
     }
 
