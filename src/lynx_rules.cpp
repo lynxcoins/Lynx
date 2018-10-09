@@ -243,7 +243,7 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
     return true;
 }
 
-bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams)
+bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams, bool from_builtin_miner /* = false */)
 {
     if (nHeight <= consensusParams.HardFork6Height)
         return true; // The rule does not yet apply
@@ -262,17 +262,28 @@ bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& 
     std::string addrHex = HexStr(addrSha256Raw, addrSha256Raw + CSHA256::OUTPUT_SIZE);
     std::string blockHex = pblock->GetHash().ToString();
 
-    LogPrintf("Reward address: %s\n", addr);
-    LogPrintf("Address_hash: %s\n", addrHex);
-    LogPrintf("Block hash: %s\n", blockHex);
+    if (from_builtin_miner)
+    {
+        LogPrint(BCLog::MINER, "BuiltinMiner: Reward address: %s\n", addr);
+        LogPrint(BCLog::MINER, "BuiltinMiner: Address_hash: %s\n", addrHex);
+        LogPrint(BCLog::MINER, "BuiltinMiner: Block hash: %s\n", blockHex);
+    }
 
     auto lastCharsCount = consensusParams.HardFork6CheckLastCharsCount;
     bool res = 0 == addrHex.compare(addrHex.size() - lastCharsCount, lastCharsCount,
                                     blockHex, blockHex.size() - lastCharsCount, lastCharsCount);
-    if (!res)
-        return error("CheckLynxRule3(): block hash and sha256 hash of the first destination should last on the same 2 chars");
-
-    return true;
+    if (from_builtin_miner)
+    {
+        if (res)
+            LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 passed\n", blockHex);
+        else
+            LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 failed. Block hash and sha256 hash of the first destination should last on the same %d chars (%s<>%s)\n", 
+                    blockHex,
+                    lastCharsCount,
+                    addrHex.substr(addrHex.size() - lastCharsCount), 
+                    blockHex.substr(blockHex.size() - lastCharsCount));
+    }
+    return res;
 }
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
