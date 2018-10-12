@@ -3155,7 +3155,9 @@ void GetScriptForMining(CWallet * const pwallet, std::shared_ptr<CReserveScript>
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't get current block");
     }
 
-    if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
+    int n_blocks = 0;
+    // chainActive.Height() is current height, +1 - height of the new block
+    if (!GetLynxHardForkParam(height + 1, consensusParams.HardForkRule2params, n_blocks))
     {
         pwallet->GetScriptForMining(coinbase_script);
         // If the keypool is exhausted, no script is returned at all.  Catch this.
@@ -3279,7 +3281,8 @@ UniValue generatetoaddress(const JSONRPCRequest& request)
             cur_pindex = chainActive.Tip();
         }
 
-        if ((height + 1) > consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
+        int nblocks = 0;
+        if (GetLynxHardForkParam(height + 1, consensusParams.HardForkRule1params, nblocks))
         {
             std::map<CTxDestination, CAmount> balances;
             {

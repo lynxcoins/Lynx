@@ -25,4 +25,5 @@ bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& 
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state);
 
+bool GetLynxHardForkParam(int cur_height, const std::vector<Consensus::HFLynxParams>& params, int& param);
 #endif // BITCOIN_LYNX_VALIDATION_H

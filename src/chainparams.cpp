@@ -84,15 +84,24 @@ public:
         consensus.HardForkHeight = 126250;
         consensus.HardFork2Height = 1711675;
         consensus.HardFork3Height = 1838000;
-        consensus.HardFork4Height = 99999999;
-        consensus.HardFork5Height = 99999999;
-        consensus.HardFork6Height = 99999999;
-        consensus.HardFork4AddressPrevBlockCount = 60;
-        consensus.HardFork5CoinAgePow = 4;
-        consensus.HardFork5DifficultyPrevBlockCount = 10;
-        consensus.HardFork5LowerLimitMinBalance = 1000*COIN;
-        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
-        consensus.HardFork6CheckLastCharsCount = 2;
+
+        consensus.HardForkRule1params = {{2500000, 10},
+                                         {2600000, 20},
+                                         {2700000, 30},
+                                         {2800000, 40},
+                                         {2900000, 50}};
+
+        consensus.HardForkRule2params = {{2550000, 2},
+                                         {3100000, 3},
+                                         {3600000, 4}};
+
+        consensus.HardForkRule3params = {{2650000, 1},
+                                         {3500000, 2},
+                                         {5500000, 3}};
+
+        consensus.HardForkRule2DifficultyPrevBlockCount = 10;
+        consensus.HardForkRule2LowerLimitMinBalance = 1000*COIN;
+        consensus.HardForkRule2UpperLimitMinBalance = 100000000*COIN;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 1 * 60 * 60; // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 30;
@@ -195,15 +204,24 @@ public:
         consensus.HardForkHeight = 100;
         consensus.HardFork2Height = 200;
         consensus.HardFork3Height = 300;
-        consensus.HardFork4Height = 2000;
-        consensus.HardFork5Height = 2500;
-        consensus.HardFork6Height = 3000;
-        consensus.HardFork4AddressPrevBlockCount = 30;
-        consensus.HardFork5DifficultyPrevBlockCount = 10;
-        consensus.HardFork5CoinAgePow = 2;
-        consensus.HardFork5LowerLimitMinBalance = 1*COIN;
-        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
-        consensus.HardFork6CheckLastCharsCount = 1;
+
+        consensus.HardForkRule1params = {{250, 10},
+                                         {260, 20},
+                                         {270, 30},
+                                         {280, 40},
+                                         {290, 50}};
+
+        consensus.HardForkRule2params = {{255, 2},
+                                         {310, 3},
+                                         {360, 4}};
+
+        consensus.HardForkRule3params = {{265, 1},
+                                         {350, 2},
+                                         {550, 3}};
+
+        consensus.HardForkRule2DifficultyPrevBlockCount = 10;
+        consensus.HardForkRule2LowerLimitMinBalance = 1*COIN;
+        consensus.HardForkRule2UpperLimitMinBalance = 100000000*COIN;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 1 * 60 * 60; // // KittehCoin: retarget every 1 hours
         consensus.PowTargetSpacingV1 = 60;
@@ -298,15 +316,14 @@ public:
         consensus.HardForkHeight = -1;
         consensus.HardFork2Height = -1;
         consensus.HardFork3Height = -1;
-        consensus.HardFork4Height = 35;
-        consensus.HardFork5Height = 40;
-        consensus.HardFork6Height = 45;
-        consensus.HardFork4AddressPrevBlockCount = 2;
-        consensus.HardFork5CoinAgePow = 1;
-        consensus.HardFork5DifficultyPrevBlockCount = 10;
-        consensus.HardFork5LowerLimitMinBalance = 1*COIN;
-        consensus.HardFork5UpperLimitMinBalance = 100000000*COIN;
-        consensus.HardFork6CheckLastCharsCount = 1;
+
+        consensus.HardForkRule1params = {{35, 2}};
+        consensus.HardForkRule2params = {{40, 1}};
+        consensus.HardForkRule3params = {{45, 1}};
+
+        consensus.HardForkRule2DifficultyPrevBlockCount = 10;
+        consensus.HardForkRule2LowerLimitMinBalance = 1*COIN;
+        consensus.HardForkRule2UpperLimitMinBalance = 100000000*COIN;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // two weeks
         consensus.PowTargetSpacingV1 = 60;

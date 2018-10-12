@@ -34,7 +34,7 @@ static CBlockIndex* GetDifficultyBlockIndex()
 {
     const auto& consensusParams = Params().GetConsensus();
     CBlockIndex* difficultyBlockIndex = chainActive.Tip();
-    for (int i = 0; i < consensusParams.HardFork5DifficultyPrevBlockCount; ++i)
+    for (int i = 0; i < consensusParams.HardForkRule2DifficultyPrevBlockCount; ++i)
         difficultyBlockIndex = difficultyBlockIndex->pprev;
     return difficultyBlockIndex;
 }
@@ -72,7 +72,8 @@ BOOST_AUTO_TEST_CASE(lunx_rule1)
         {address3, 0}
     };
     // Let's check that the rules are still inactive
-    while (chainActive.Height() < consensusParams.HardFork4Height)
+    int n_blocks = 0;
+    while (!GetLynxHardForkParam(chainActive.Height(), consensusParams.HardForkRule1params, n_blocks))
     {
         std::string errorString;
         BOOST_CHECK(IsValidAddressForMining(address, 0, chainActive.Tip(), consensusParams, errorString));
@@ -192,7 +193,8 @@ BOOST_AUTO_TEST_CASE(lunx_rule2)
         {address3, 0}
     };
     // Let's check that the rules are still inactive
-    while (chainActive.Height() < consensusParams.HardFork5Height)
+    int pow = 0;
+    while (!GetLynxHardForkParam(chainActive.Height(), consensusParams.HardForkRule2params, pow))
     {
         BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), 0);
 
@@ -208,19 +210,22 @@ BOOST_AUTO_TEST_CASE(lunx_rule2)
     BOOST_CHECK_EQUAL(FindAddressForMining(zeroBalances, chainActive.Tip(), consensusParams), nullptr);
 
     // The difficulty is small, so a minimum limit is required for mining
-    BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), consensusParams.HardFork5LowerLimitMinBalance);
+    BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), consensusParams.HardForkRule2LowerLimitMinBalance);
     {
         CBlockIndex* difficultyBlockIndex = GetDifficultyBlockIndex();
         auto savedNBits = difficultyBlockIndex->nBits;
 
         // Usually the minimum balance is defined as pow(DiffcultyPredN, consensusParams.HardFork5CoinAgePow)
         difficultyBlockIndex->nBits = 480000000;
-        CAmount etalonMinBalance = static_cast<CAmount>(std::pow(GetDifficulty(difficultyBlockIndex), consensusParams.HardFork5CoinAgePow)*COIN);
+
+        int pow = 0;
+        GetLynxHardForkParam(chainActive.Height(), consensusParams.HardForkRule2params, pow);
+        CAmount etalonMinBalance = static_cast<CAmount>(std::pow(GetDifficulty(difficultyBlockIndex), pow) * COIN);
         BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), etalonMinBalance);
 
         // The difficulty is too great, the necessary limit for mining will be limited from above
         difficultyBlockIndex->nBits = 10000;
-        BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), consensusParams.HardFork5UpperLimitMinBalance);
+        BOOST_CHECK_EQUAL(GetMinBalanceForMining(chainActive.Tip(), consensusParams), consensusParams.HardForkRule2UpperLimitMinBalance);
 
         difficultyBlockIndex->nBits = savedNBits;
     }
@@ -260,7 +265,8 @@ BOOST_AUTO_TEST_CASE(lunx_rule3)
     const CTxDestination address3 = coinbaseKey3.GetPubKey().GetID();
 
     // Let's check that the rules are still inactive
-    while (chainActive.Height() < consensusParams.HardFork6Height)
+    int n_chars = 0;
+    while (!GetLynxHardForkParam(chainActive.Height(), consensusParams.HardForkRule3params, n_chars))
     {
         std::map<CTxDestination, CAmount> balances = {
             {address, pcoinsTip->GetAddressBalance(CBitcoinAddress(address).ToString())},
@@ -277,7 +283,7 @@ BOOST_AUTO_TEST_CASE(lunx_rule3)
     }
 
     // Let's check that the rule works
-    while (chainActive.Height() < consensusParams.HardFork6Height + 1)
+    while (!GetLynxHardForkParam(chainActive.Height() - 1, consensusParams.HardForkRule3params, n_chars))
     {
         std::map<CTxDestination, CAmount> balances = {
             {address, pcoinsTip->GetAddressBalance(CBitcoinAddress(address).ToString())},
@@ -290,9 +296,12 @@ BOOST_AUTO_TEST_CASE(lunx_rule3)
         auto oldChainHeight = chainActive.Height();
         CBlock block = CreateAndProcessBlock({}, GetScriptForDestination(*addressForMining));
         auto blockHash = block.GetHash().ToString();
-        auto blockHashLastChars = blockHash.substr(blockHash.size() - consensusParams.HardFork6CheckLastCharsCount);
+
+        int n_chars = 0;
+        GetLynxHardForkParam(chainActive.Height(), consensusParams.HardForkRule3params, n_chars);
+        auto blockHashLastChars = blockHash.substr(blockHash.size() - n_chars);
         auto addressHash = sha256(*addressForMining);
-        auto addressHashLastChars = addressHash.substr(addressHash.size() - consensusParams.HardFork6CheckLastCharsCount);
+        auto addressHashLastChars = addressHash.substr(addressHash.size() - n_chars);
         if (chainActive.Height() > oldChainHeight)
         {
             // The block was added to the chain, making sure that the HASH is correct
