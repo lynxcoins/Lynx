@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include "consensus/validation.h"
+#include "consensus/params.h"
 #include "rpc/blockchain.h"
 #include "validation.h"
 #include "util.h"
@@ -11,35 +12,55 @@
 #include "lynx_rules.h"
 
 
+bool GetLynxHardForkParam(int cur_height, const std::vector<Consensus::HFLynxParams>& params, int& param)
+{
+    param = 0; // set to default always
+    for (auto pair = params.rbegin(); pair != params.rend(); ++pair)
+    {
+        if (cur_height > pair->height)
+        {
+            param = pair->param;
+            return true;
+        }
+    }
+    return false;
+}
+
 CAmount GetMinBalanceForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams)
 {
-    if (pBestBlockIndex->nHeight < consensusParams.HardFork5Height)
+    int pow = 0;
+    if (!GetLynxHardForkParam(pBestBlockIndex->nHeight, consensusParams.HardForkRule2params, pow))
         return 0;
-
-    double difficulty = GetDifficultyPrevN(pBestBlockIndex, consensusParams.HardFork5DifficultyPrevBlockCount);
-    double minBalanceForMining = std::pow(difficulty, consensusParams.HardFork5CoinAgePow)*COIN;
-    if (std::isinf(minBalanceForMining) || minBalanceForMining > consensusParams.HardFork5UpperLimitMinBalance)
-        return consensusParams.HardFork5UpperLimitMinBalance;
-    return std::max(static_cast<CAmount>(minBalanceForMining), consensusParams.HardFork5LowerLimitMinBalance);
+    else
+    {
+        double difficulty = GetDifficultyPrevN(pBestBlockIndex, consensusParams.HardForkRule2DifficultyPrevBlockCount);
+        double minBalanceForMining = std::pow(difficulty, pow) * COIN;
+        if (std::isinf(minBalanceForMining) || minBalanceForMining > consensusParams.HardForkRule2UpperLimitMinBalance)
+            return consensusParams.HardForkRule2UpperLimitMinBalance;
+        return std::max(static_cast<CAmount>(minBalanceForMining), consensusParams.HardForkRule2LowerLimitMinBalance);
+    }
 }
 
 bool GetAddressesProhibitedForMining(const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams, std::set<std::string>& result)
 {
-    if (pBestBlockIndex->nHeight < consensusParams.HardFork4Height)
+    int n_blocks = 0;
+    if (!GetLynxHardForkParam(pBestBlockIndex->nHeight, consensusParams.HardForkRule1params, n_blocks))
         return true;
-
-    const CBlockIndex* pindex = pBestBlockIndex;
-    for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && pindex != NULL; i++, pindex = pindex->pprev)
+    else
     {
-        CBlock block;
-        if (!ReadBlockFromDisk(block, pindex, consensusParams))
-            return false;
+        const CBlockIndex* pindex = pBestBlockIndex;
+        for (int i = 0; i < n_blocks && pindex != NULL; i++, pindex = pindex->pprev)
+        {
+            CBlock block;
+            if (!ReadBlockFromDisk(block, pindex, consensusParams))
+                return false;
 
-        std::vector<std::string> blockDests = GetTransactionDestinations(block.vtx[0]);
-        result.insert(blockDests.begin(), blockDests.end());
+            std::vector<std::string> blockDests = GetTransactionDestinations(block.vtx[0]);
+            result.insert(blockDests.begin(), blockDests.end());
+        }
+
+        return true;
     }
-
-    return true;
 }
 
 const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmount>& balances, const CBlockIndex* pBestBlockIndex, const Consensus::Params& consensusParams)
@@ -141,7 +162,8 @@ bool GetScriptForMiningFromCandidates(const std::vector<std::string>& address_ca
         return error("Can't get current block");
     }
 
-    if ((height + 1) <= consensusParams.HardFork4Height) // chainActive.Height() is current height, +1 - height of the new block
+    int n_blocks = 0;
+    if (!GetLynxHardForkParam(height, consensusParams.HardForkRule1params, n_blocks))
     {
         found = GetRandomValidAddressForMining(address_candidates, address);
     }
@@ -186,104 +208,112 @@ bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, con
 
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    if (pindex->nHeight <= consensusParams.HardFork4Height)
+    int n_blocks = 0;
+    if (!GetLynxHardForkParam(pindex->nHeight, consensusParams.HardForkRule1params, n_blocks))
         return true; // The rule does not yet apply
-
-    // rule1:
-    // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
-    // such destination in coinbase tx
-
-    std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
-    CBlockIndex* prevIndex = pindex->pprev;
-
-    for (int i = 0; i < consensusParams.HardFork4AddressPrevBlockCount && prevIndex != NULL; i++, prevIndex = prevIndex->pprev)
+    else
     {
-        CBlock prevBlock;
-        if (!ReadBlockFromDisk(prevBlock, prevIndex, consensusParams))
-            return false;
+        // rule1:
+        // extract destination(s) of coinbase tx, for each conibase tx destination check that previous 10 blocks do not have
+        // such destination in coinbase tx
 
-        for (const auto& prevDestination : GetTransactionDestinations(prevBlock.vtx[0]))
+        std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
+        CBlockIndex* prevIndex = pindex->pprev;
+
+        for (int i = 0; i < n_blocks && prevIndex != NULL; i++, prevIndex = prevIndex->pprev)
         {
-            if (coinbaseDestinations.end() != std::find(coinbaseDestinations.begin(), coinbaseDestinations.end(), prevDestination))
-                return error("CheckLynxRule1(): new blocks with coinbase destination %s are temporarily not allowed", prevDestination);
-        }
-    }
+            CBlock prevBlock;
+            if (!ReadBlockFromDisk(prevBlock, prevIndex, consensusParams))
+                return false;
 
-    return true;
+            for (const auto& prevDestination : GetTransactionDestinations(prevBlock.vtx[0]))
+            {
+                if (coinbaseDestinations.end() != std::find(coinbaseDestinations.begin(), coinbaseDestinations.end(), prevDestination))
+                    return error("CheckLynxRule1(): new blocks with coinbase destination %s are temporarily not allowed", prevDestination);
+            }
+        }
+
+        return true;
+    }
 }
 
 bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
-    if (pindex->nHeight <= consensusParams.HardFork5Height)
+    int pow = 0;
+    if (!GetLynxHardForkParam(pindex->nHeight, consensusParams.HardForkRule2params, pow))
         return true; // The rule does not yet apply
-
-    // rule2:
-    // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
-    // in the miners reward address and the difficulty value of the previous 10th block
-
-    std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
-    if (coinbaseDestinations.empty())
-        return error("CheckLynxRule2(): GetTransactionFirstAddress failed. Address was not found");
-
-    const std::string& addr = coinbaseDestinations[0];
-    CAmount balance;
+    else
     {
-        LOCK(cs_main);
-        balance = pcoinsTip->GetAddressBalance(addr);
-    }
+        // rule2:
+        // first address from coinbase transaction must have a coin age of 1000 or greater. The coin age is the product of the number of coins
+        // in the miners reward address and the difficulty value of the previous 10th block
 
-    CBlockIndex* prevIndex = pindex->pprev; // Use the block that was the best at the time of our block's mining
-    CAmount minBalanceForMining = GetMinBalanceForMining(prevIndex, consensusParams);
-    if (balance < minBalanceForMining)
-    {
-        return error("CheckLynxRule2(): not enough coins on address %s: balance=%i, minBalanceForMining=%i",
-            coinbaseDestinations[0], balance, minBalanceForMining);
-    }
+        std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
+        if (coinbaseDestinations.empty())
+            return error("CheckLynxRule2(): GetTransactionFirstAddress failed. Address was not found");
 
-    return true;
+        const std::string& addr = coinbaseDestinations[0];
+        CAmount balance;
+        {
+            LOCK(cs_main);
+            balance = pcoinsTip->GetAddressBalance(addr);
+        }
+
+        CBlockIndex* prevIndex = pindex->pprev; // Use the block that was the best at the time of our block's mining
+        CAmount minBalanceForMining = GetMinBalanceForMining(prevIndex, consensusParams);
+        if (balance < minBalanceForMining)
+        {
+            return error("CheckLynxRule2(): not enough coins on address %s: balance=%i, minBalanceForMining=%i",
+                coinbaseDestinations[0], balance, minBalanceForMining);
+        }
+
+        return true;
+    }
 }
 
 bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams, bool from_builtin_miner /* = false */)
 {
-    if (nHeight <= consensusParams.HardFork6Height)
+    int n_chars = 0;
+    if (!GetLynxHardForkParam(nHeight, consensusParams.HardForkRule3params, n_chars))
         return true; // The rule does not yet apply
-   
-    // rule3:
-    // the last 2 chars in the sha256 hash of address, must match the last
-    // 2 chars of the block hash value submitted by the miner in the candidate block.
-
-    std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
-    if (coinbaseDestinations.empty())
-        return error("CheckLynxRule3(): GetTransactionFirstAddress failed. Address was not found");
-
-    const std::string& addr = coinbaseDestinations[0];
-    unsigned char addrSha256Raw[CSHA256::OUTPUT_SIZE];
-    CSHA256().Write((const unsigned char*)addr.c_str(), addr.size()).Finalize(addrSha256Raw);
-    std::string addrHex = HexStr(addrSha256Raw, addrSha256Raw + CSHA256::OUTPUT_SIZE);
-    std::string blockHex = pblock->GetHash().ToString();
-
-    if (from_builtin_miner)
+    else
     {
-        LogPrint(BCLog::MINER, "BuiltinMiner: Reward address: %s\n", addr);
-        LogPrint(BCLog::MINER, "BuiltinMiner: Address_hash: %s\n", addrHex);
-        LogPrint(BCLog::MINER, "BuiltinMiner: Block hash: %s\n", blockHex);
-    }
+        // rule3:
+        // the last 2 chars in the sha256 hash of address, must match the last
+        // 2 chars of the block hash value submitted by the miner in the candidate block.
 
-    auto lastCharsCount = consensusParams.HardFork6CheckLastCharsCount;
-    bool res = 0 == addrHex.compare(addrHex.size() - lastCharsCount, lastCharsCount,
-                                    blockHex, blockHex.size() - lastCharsCount, lastCharsCount);
-    if (from_builtin_miner)
-    {
-        if (res)
-            LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 passed\n", blockHex);
-        else
-            LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 failed. Block hash and sha256 hash of the first destination should last on the same %d chars (%s<>%s)\n", 
-                    blockHex,
-                    lastCharsCount,
-                    addrHex.substr(addrHex.size() - lastCharsCount), 
-                    blockHex.substr(blockHex.size() - lastCharsCount));
+        std::vector<std::string> coinbaseDestinations = GetTransactionDestinations(pblock->vtx[0]);
+        if (coinbaseDestinations.empty())
+            return error("CheckLynxRule3(): GetTransactionFirstAddress failed. Address was not found");
+
+        const std::string& addr = coinbaseDestinations[0];
+        unsigned char addrSha256Raw[CSHA256::OUTPUT_SIZE];
+        CSHA256().Write((const unsigned char*)addr.c_str(), addr.size()).Finalize(addrSha256Raw);
+        std::string addrHex = HexStr(addrSha256Raw, addrSha256Raw + CSHA256::OUTPUT_SIZE);
+        std::string blockHex = pblock->GetHash().ToString();
+
+        if (from_builtin_miner)
+        {
+            LogPrint(BCLog::MINER, "BuiltinMiner: Reward address: %s\n", addr);
+            LogPrint(BCLog::MINER, "BuiltinMiner: Address_hash: %s\n", addrHex);
+            LogPrint(BCLog::MINER, "BuiltinMiner: Block hash: %s\n", blockHex);
+        }
+
+        bool res = 0 == addrHex.compare(addrHex.size() - n_chars, n_chars,
+                                        blockHex, blockHex.size() - n_chars, n_chars);
+        if (from_builtin_miner)
+        {
+            if (res)
+                LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 passed\n", blockHex);
+            else
+                LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block %s Rule3 failed. Block hash and sha256 hash of the first destination should last on the same %d chars (%s<>%s)\n", 
+                        blockHex,
+                        n_chars,
+                        addrHex.substr(addrHex.size() - n_chars), 
+                        blockHex.substr(blockHex.size() - n_chars));
+        }
+        return res;
     }
-    return res;
 }
 
 bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams, CValidationState& state)
@@ -293,7 +323,7 @@ bool CheckLynxRules(const CBlock* pblock, const CBlockIndex* pindex, const Conse
 
     if (!CheckLynxRule2(pblock, pindex, consensusParams))
         return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
-    
+
     if (!CheckLynxRule3(pblock, pindex->nHeight, consensusParams))
         return state.DoS(100, false, REJECT_INVALID, "bad-cb-destination");
 

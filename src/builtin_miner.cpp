@@ -217,8 +217,8 @@ namespace
         while (running)
         {
             std::this_thread::sleep_for(log_interval);
-            float speed = float(hash_counter.exchange(0)) / 1000 / Log_Speed_interval_sec;
-            LogPrint(BCLog::MINER, "BuiltinMiner: Mining speed %0.4f kH/s\n", speed);
+            float speed = float(hash_counter.exchange(0)) / Log_Speed_interval_sec;
+            LogPrint(BCLog::MINER, "BuiltinMiner: Mining speed %0.1f H/s\n", speed);
         }
     }
 
