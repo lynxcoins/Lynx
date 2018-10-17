@@ -363,8 +363,8 @@ Alihkan fail data ke dalam tab semasa</translation>
         <translation>sahkan mesej</translation>
     </message>
     <message>
-        <source>Litecoin</source>
-        <translation>Litecoin</translation>
+        <source>Lynx</source>
+        <translation>Lynx</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -391,12 +391,12 @@ Alihkan fail data ke dalam tab semasa</translation>
         <translation>sulitkan kata laluan milik peribadi anda </translation>
     </message>
     <message>
-        <source>Sign messages with your Litecoin addresses to prove you own them</source>
-        <translation>Log mesej dengan alamat Litecoin anda untuk membuktikan anda memilikinya</translation>
+        <source>Sign messages with your Lynx addresses to prove you own them</source>
+        <translation>Log mesej dengan alamat Lynx anda untuk membuktikan anda memilikinya</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Litecoin addresses</source>
-        <translation>Sahkan mesej untuk memastikan mereka telah ditandatangani dengan alamat Litecoin yang ditentukan</translation>
+        <source>Verify messages to ensure they were signed with specified Lynx addresses</source>
+        <translation>Sahkan mesej untuk memastikan mereka telah ditandatangani dengan alamat Lynx yang ditentukan</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -437,6 +437,10 @@ Alihkan fail data ke dalam tab semasa</translation>
     </context>
 <context>
     <name>Intro</name>
+    <message>
+        <source>Lynx</source>
+        <translation>Lynx</translation>
+    </message>
     </context>
 <context>
     <name>ModalOverlay</name>

@@ -575,6 +575,10 @@
         <translation>ใช้ไดเร็กทอรี่ข้อมูลที่ตั้งค่าเอง:</translation>
     </message>
     <message>
+        <source>Lynx</source>
+        <translation>Lynx</translation>
+    </message>
+    <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
         <translation>ข้อผิดพลาด: ไดเร็กทอรี่ข้อมูลที่ต้องการ "%1" ไม่สามารถสร้างได้</translation>
     </message>
@@ -648,14 +652,6 @@
         <translation>จำนวนของสคริปท์ &amp;verification threads</translation>
     </message>
     <message>
-        <source>Accept connections from outside</source>
-        <translation>ยอมรับ การเชื่อมต่อจากภายนอก</translation>
-    </message>
-    <message>
-        <source>Allow incoming connections</source>
-        <translation>ยอมให้เชื่อมต่อจากภายนอกได้</translation>
-    </message>
-    <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
         <translation>IP แอดเดส ของ proxy (เช่น IPv4: 127.0.0.1 / IPv6: ::1)</translation>
     </message>
@@ -666,10 +662,6 @@
     <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
         <translation>URL แบบอื่น (ยกตัวอย่าง เอ็กพลอเลอร์บล็อก) ที่อยู่ใน เมนูรายการ ลำดับ %s ใน URL จะถูกเปลี่ยนด้วย รายการแฮช URL ที่เป็นแบบหลายๆอัน จะถูกแยก โดย เครื่องหมายเส้นบาร์ตั้ง |</translation>
-    </message>
-    <message>
-        <source>Third party transaction URLs</source>
-        <translation>URI รายการ แบบของเจ้าอื่นๆ</translation>
     </message>
     <message>
         <source>Active command-line options that override above options:</source>
@@ -744,10 +736,6 @@
         <translation>ใช้ในการเข้าถึงอีกฝ่ายหนึ่ง peer โดย:</translation>
     </message>
     <message>
-        <source>Shows, if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
-        <translation>แสดง หากใช้พร็อกซี่ SOCKS5 ที่เป็นค่าเริ่มต้น เพื่อเข้าถึง peer อีกฝ่าย ผ่านทางเน็ตเวิร์กชนิดนี้</translation>
-    </message>
-    <message>
         <source>IPv4</source>
         <translation>IPv4</translation>
     </message>
@@ -772,16 +760,12 @@
         <translation>&amp;วันโดว์</translation>
     </message>
     <message>
-        <source>&amp;Hide the icon from the system tray.</source>
-        <translation>&amp;ซ่อนไอคอน จากเทรย์ระบบ</translation>
-    </message>
-    <message>
-        <source>Hide tray icon</source>
-        <translation>ซ่อนไอคอนเทรย์</translation>
-    </message>
-    <message>
         <source>Show only a tray icon after minimizing the window.</source>
         <translation>แสดงเทรย์ไอคอน หลังมืนิไมส์วินโดว์ เท่านั้น</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>ข้อผิดพลาด</translation>
     </message>
     </context>
 <context>

@@ -456,10 +456,6 @@
         <translation>UPnP प्रयोग गरेर सुन्ने पोर्टलाई म्याप गर्नुहोस् (सुन्दा र -प्रोक्सी नहुँदा डिफल्ट: 1)</translation>
     </message>
     <message>
-        <source>You need to rebuild the database using -reindex-chainstate to change -txindex</source>
-        <translation>तपाईंले -चेनस्टेट-पुनः सूचकांकबाट -txindex परिवर्तन प्रयोग गरेर डाटाबेस पुनर्निर्माण गर्नु आवश्यक छ</translation>
-    </message>
-    <message>
         <source>%s corrupt, salvage failed</source>
         <translation>%s मा क्षति, बचाव विफल भयो</translation>
     </message>
@@ -540,14 +536,6 @@
         <translation>ब्लक प्रमाणित गरिँदै...</translation>
     </message>
     <message>
-        <source>Verifying wallet...</source>
-        <translation>वालेट प्रमाणित गरिँदै...</translation>
-    </message>
-    <message>
-        <source>Wallet %s resides outside data directory %s</source>
-        <translation>वालेट %s डाटा निर्देशिका %s बाहिरमा बस्छ</translation>
-    </message>
-    <message>
         <source>Wallet debugging/testing options:</source>
         <translation>वालेट डिबगिङ/परीक्षणका विकल्पहरू:</translation>
     </message>
@@ -566,10 +554,6 @@
     <message>
         <source>Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6</source>
         <translation>दिइएको ठेगानामा बाँध्नुहोस् र यसमा कनेक्ट गर्ने सहकर्मीलाई श्वेतसूचीमा राख्नुहोस् । IPv6 लागि [होस्ट]:पोर्ट संकेतन प्रयोग गर्नुहोस्</translation>
-    </message>
-    <message>
-        <source>Bind to given address to listen for JSON-RPC connections. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)</source>
-        <translation>JSON-RPC कनेक्सन सुन्नको लागि दिइएको ठेगानामा बाँध्नुहोस् । IPv6 लागि [होस्ट]:पोर्ट संकेतन प्रयोग गर्नुहोस् । यो विकल्पलाई धेरै पटक निर्दिष्ट गर्न सकिन्छ (डिफल्ट: सबै इन्टरफेसमा बाँध्नुहोस्)</translation>
     </message>
     <message>
         <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
@@ -608,16 +592,8 @@
         <translation>हरेक प्रोक्सी कनेक्सनका लागि क्रेडिन्सियल अनियमित बनाउनुहोस् । यसले टोर स्ट्रिमको अलगावलाई सक्षम पार्छ (डिफल्ट: %u)</translation>
     </message>
     <message>
-        <source>Set maximum size of high-priority/low-fee transactions in bytes (default: %d)</source>
-        <translation>बाइटमा उच्च-प्राथमिकता/कम शुल्कको कारोबारको अधिकतम आकार सेट गर्नुहोस् (डिफल्ट: %d)</translation>
-    </message>
-    <message>
         <source>The transaction amount is too small to send after the fee has been deducted</source>
         <translation>कारोबार रकम शुल्क कटौती गरेपछि पठाउँदा धेरै नै सानो हुन्छ</translation>
-    </message>
-    <message>
-        <source>Use hierarchical deterministic key generation (HD) after BIP32. Only has effect during wallet creation/first start</source>
-        <translation>BIP32 पछि पदानुक्रमित निर्धारक की सिर्जना (HD) प्रयोग गर्नुहोस् ।. केवल वालेट सिर्जना/पहिलो सुरुवातको समयमा प्रभाव पार्छ</translation>
     </message>
     <message>
         <source>Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway</source>

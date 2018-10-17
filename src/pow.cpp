@@ -1,9 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "pow.h"
+#include <pow.h>
 
 #include "arith_uint256.h"
 #include "chain.h"
@@ -223,9 +223,9 @@ static unsigned int GetNextWorkRequired_Litecoin(const CBlockIndex* pindexLast, 
     // Go back by what we want to be 14 days worth of blocks
     // Litecoin: This fixes an issue where a 51% attack can change difficulty at will.
     // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
-    int blockstogoback = params.DifficultyAdjustmentInterval(pindexLast->nHeight+1)-1;
-    if ((pindexLast->nHeight+1) != params.DifficultyAdjustmentInterval(pindexLast->nHeight+1))
-        blockstogoback = params.DifficultyAdjustmentInterval(pindexLast->nHeight+1);
+    int blockstogoback = params.DifficultyAdjustmentInterval()-1;
+    if ((pindexLast->nHeight+1) != params.DifficultyAdjustmentInterval())
+        blockstogoback = params.DifficultyAdjustmentInterval();
 
     // Go back by what we want to be 14 days worth of blocks
     const CBlockIndex* pindexFirst = pindexLast;

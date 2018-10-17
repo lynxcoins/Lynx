@@ -1,15 +1,15 @@
-// Copyright (c) 2012-2015 The Bitcoin Core developers
+// Copyright (c) 2012-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "key.h"
+#include <key.h>
 
-#include "base58.h"
-#include "script/script.h"
-#include "uint256.h"
-#include "util.h"
-#include "utilstrencodings.h"
-#include "test/test_bitcoin.h"
+#include <base58.h>
+#include <script/script.h>
+#include <uint256.h>
+#include <util.h>
+#include <utilstrencodings.h>
+#include <test/test_bitcoin.h>
 
 #include <string>
 #include <vector>
@@ -25,9 +25,9 @@ static const CBitcoinAddress addr2 ("KT3VBZ6WHK4nC3fwuADGbEHzGyeo4J5i84");
 static const CBitcoinAddress addr1C("KB66BdCsgPUyHKvz4xJWbjR2Eb22U8ZmdC");
 static const CBitcoinAddress addr2C("K7UMQufE9YSRuMnbJc8tVy6KwXKACBm5mV");
 
+static const std::string strAddressBad = "Lbi6bpMhSwp2CXkivEeUK9wzyQEFzHDfSr";
 
 static const std::string strAddressBad("Lbi6bpMhSwp2CXkivEeUK9wzyQEFzHDfSr");
-
 
 BOOST_FIXTURE_TEST_SUITE(key_tests, BasicTestingSetup)
 
@@ -74,10 +74,10 @@ BOOST_AUTO_TEST_CASE(key_test1)
     BOOST_CHECK(!key2C.VerifyPubKey(pubkey2));
     BOOST_CHECK(key2C.VerifyPubKey(pubkey2C));
 
-    BOOST_CHECK(addr1.Get()  == CTxDestination(pubkey1.GetID()));
-    BOOST_CHECK(addr2.Get()  == CTxDestination(pubkey2.GetID()));
-    BOOST_CHECK(addr1C.Get() == CTxDestination(pubkey1C.GetID()));
-    BOOST_CHECK(addr2C.Get() == CTxDestination(pubkey2C.GetID()));
+    BOOST_CHECK(DecodeDestination(addr1)  == CTxDestination(pubkey1.GetID()));
+    BOOST_CHECK(DecodeDestination(addr2)  == CTxDestination(pubkey2.GetID()));
+    BOOST_CHECK(DecodeDestination(addr1C) == CTxDestination(pubkey1C.GetID()));
+    BOOST_CHECK(DecodeDestination(addr2C) == CTxDestination(pubkey2C.GetID()));
 
     for (int n=0; n<16; n++)
     {

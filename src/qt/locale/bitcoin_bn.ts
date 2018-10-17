@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>undefined</translation>
+        <translation>নতুন একটি ঠিকানা তৈরি করুন</translation>
     </message>
     </context>
 <context>

@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Клик правой кнопкой для редактирования адреса или метки</translation>
+        <translation>Кликните правой кнопкой для редактирования адреса или метки</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -27,11 +27,11 @@
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>Удалить выбранный адрес из списка</translation>
+        <translation>Удалить текущий выбранный адрес из списка</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>Экспортировать данные из вкладки в файл</translation>
+        <translation>Экспортировать данные текущей вкладки в файл</translation>
     </message>
     <message>
         <source>&amp;Export</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>Произошла ошибка при сохранении списка адресов в %1. Пожалуйста, попробуйте еще раз.</translation>
+        <translation>Произошла ошибка сохранения списка адресов в %1. Пожалуйста, повторите попытку.</translation>
     </message>
 </context>
 <context>
@@ -117,7 +117,7 @@
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>Диалог ввода пароля</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <source>Enter passphrase</source>
@@ -132,24 +132,20 @@
         <translation>Повторите новый пароль</translation>
     </message>
     <message>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Введите новый пароль бумажника.&lt;br/&gt;Используйте пароль, состоящий из &lt;b&gt;десяти или более случайных символов&lt;/b&gt;, или &lt;b&gt;восьми или более слов&lt;/b&gt;.</translation>
+        <source>Show password</source>
+        <translation>Показать пароль</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>Зашифровать бумажник</translation>
+        <translation>Зашифровать электронный кошелёк</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>Для выполнения операции требуется пароль вашего бумажника.</translation>
+        <translation>Для выполнения операции требуется пароль от вашего кошелька.</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
         <translation>Разблокировать бумажник</translation>
-    </message>
-    <message>
-        <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
-        <translation>Для выполнения операции требуется пароль вашего бумажника.</translation>
     </message>
     <message>
         <source>Decrypt wallet</source>
@@ -157,43 +153,43 @@
     </message>
     <message>
         <source>Change passphrase</source>
-        <translation>Сменить пароль</translation>
+        <translation>Изменить пароль</translation>
     </message>
     <message>
         <source>Enter the old passphrase and new passphrase to the wallet.</source>
-        <translation>Введите старый и новый пароль для бумажника.</translation>
+        <translation>Введите старый и новый пароль для кошелька.</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
-        <translation>Подтвердите шифрование бумажника</translation>
+        <translation>Подтвердить шифрование кошелька</translation>
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LYNXES&lt;/b&gt;!</source>
-        <translation>Предупреждение: если вы зашифруете бумажник и потеряете пароль, вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ ВАШИ БИТКОИНЫ&lt;/b&gt;!</translation>
+        <translation>Предупреждение: если вы зашифруете кошелёк и потеряете пароль, вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ ВАШИ БИТКОИНЫ&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>Вы уверены, что хотите зашифровать ваш бумажник?</translation>
+        <translation>Вы уверены, что хотите зашифровать ваш кошелёк?</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>Бумажник зашифрован</translation>
+        <translation>Кошелёк зашифрован</translation>
     </message>
     <message>
         <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your lynxes from being stolen by malware infecting your computer.</source>
-        <translation>Сейчас %1 закроется для завершения процесса шифрования. Помните, что шифрование вашего бумажника не может полностью защитить ваши биткоины от кражи с помощью инфицирования вашего компьютера вредоносным ПО.</translation>
+        <translation>Сейчас %1 закроется для завершения процесса шифрования. Помните, что шифрование вашего кошелька не может полностью защитить ваши биткоины от кражи с помощью инфицирования вашего компьютера вредоносным ПО.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>ВАЖНО: все предыдущие резервные копии вашего бумажника должны быть заменены новым зашифрованным файлом. В целях безопасности предыдущие резервные копии незашифрованного бумажника станут бесполезны, как только вы начнёте использовать новый зашифрованный бумажник.</translation>
+        <translation>ВАЖНО: все предыдущие резервные копии вашего кошелька должны быть заменены новым зашифрованным файлом. В целях безопасности предыдущие резервные копии незашифрованного кошелька станут бесполезны, как только вы начнёте использовать новый зашифрованный кошелёк.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
-        <translation>Не удалось зашифровать бумажник</translation>
+        <translation>Не удалось зашифровать кошелёк</translation>
     </message>
     <message>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
-        <translation>Шифрование бумажника не удалось из-за внутренней ошибки. Ваш бумажник не был зашифрован.</translation>
+        <translation>Шифрование кошелька не удалось из-за внутренней ошибки. Ваш кошелёк не был зашифрован.</translation>
     </message>
     <message>
         <source>The supplied passphrases do not match.</source>
@@ -201,30 +197,22 @@
     </message>
     <message>
         <source>Wallet unlock failed</source>
-        <translation>Разблокировка бумажника не удалась</translation>
+        <translation>Разблокировка кошелька не удалась</translation>
     </message>
     <message>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
-        <translation>Неверный пароль для расшифровки бумажника.</translation>
+        <translation>Неверный пароль для расшифровки кошелька.</translation>
     </message>
     <message>
         <source>Wallet decryption failed</source>
-        <translation>Расшифровка бумажника не удалась</translation>
+        <translation>Расшифровка кошелька не удалась</translation>
     </message>
-    <message>
-        <source>Wallet passphrase was successfully changed.</source>
-        <translation>Пароль бумажника успешно изменён.</translation>
-    </message>
-    <message>
-        <source>Warning: The Caps Lock key is on!</source>
-        <translation>Внимание: Caps Lock включен!</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>BanTableModel</name>
     <message>
         <source>IP/Netmask</source>
-        <translation>IP/префикс</translation>
+        <translation>IP/Маска подсети</translation>
     </message>
     <message>
         <source>Banned Until</source>
@@ -235,7 +223,7 @@
     <name>BitcoinGUI</name>
     <message>
         <source>Sign &amp;message...</source>
-        <translation>&amp;Подписать сообщение...</translation>
+        <translation>Подписать &amp;сообщение...</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -250,16 +238,12 @@
         <translation>Узел</translation>
     </message>
     <message>
-        <source>Show general overview of wallet</source>
-        <translation>Показать общий обзор действий с бумажником</translation>
-    </message>
-    <message>
         <source>&amp;Transactions</source>
         <translation>&amp;Транзакции</translation>
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>Показать историю транзакций</translation>
+        <translation>Просмотр истории транзакций</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
@@ -271,19 +255,7 @@
     </message>
     <message>
         <source>&amp;About %1</source>
-        <translation>&amp;О %1</translation>
-    </message>
-    <message>
-        <source>Show information about %1</source>
-        <translation>Показать информацию о %1</translation>
-    </message>
-    <message>
-        <source>About &amp;Qt</source>
-        <translation>О &amp;Qt</translation>
-    </message>
-    <message>
-        <source>Show information about Qt</source>
-        <translation>Показать информацию о Qt</translation>
+        <translation>&amp;Около %1</translation>
     </message>
     <message>
         <source>&amp;Options...</source>
@@ -291,11 +263,11 @@
     </message>
     <message>
         <source>Modify configuration options for %1</source>
-        <translation>Изменить конфигурационные настройки для %1</translation>
+        <translation>Изменить параметры конфигурации для %1</translation>
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>&amp;Зашифровать бумажник...</translation>
+        <translation>&amp;Зашифровать кошелёк...</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
@@ -555,154 +527,10 @@
 <context>
     <name>CoinControlDialog</name>
     <message>
-        <source>Coin Selection</source>
-        <translation>Выбор монет</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Количество:</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Байт:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Сумма:</translation>
-    </message>
-    <message>
-        <source>Fee:</source>
-        <translation>Комиссия:</translation>
-    </message>
-    <message>
-        <source>Dust:</source>
-        <translation>Пыль:</translation>
-    </message>
-    <message>
-        <source>After Fee:</source>
-        <translation>После комиссии:</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation>Сдача:</translation>
-    </message>
-    <message>
-        <source>(un)select all</source>
-        <translation>Отменить выбор всего</translation>
-    </message>
-    <message>
-        <source>Tree mode</source>
-        <translation>Режим дерева</translation>
-    </message>
-    <message>
-        <source>List mode</source>
-        <translation>Режим списка</translation>
-    </message>
-    <message>
-        <source>Amount</source>
-        <translation>Сумма</translation>
-    </message>
-    <message>
-        <source>Received with label</source>
-        <translation>Получено с пометкой</translation>
-    </message>
-    <message>
-        <source>Received with address</source>
-        <translation>Получено с адреса</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
-        <source>Confirmations</source>
-        <translation>Подтверждений</translation>
-    </message>
-    <message>
-        <source>Confirmed</source>
-        <translation>Подтверждено</translation>
-    </message>
-    <message>
-        <source>Copy address</source>
-        <translation>Копировать адрес</translation>
-    </message>
-    <message>
-        <source>Copy label</source>
-        <translation>Копировать метку</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Копировать сумму</translation>
-    </message>
-    <message>
-        <source>Copy transaction ID</source>
-        <translation>Копировать ID транзакции</translation>
-    </message>
-    <message>
-        <source>Lock unspent</source>
-        <translation>Заблокировать непотраченное</translation>
-    </message>
-    <message>
-        <source>Unlock unspent</source>
-        <translation>Разблокировать непотраченное</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Копировать количество</translation>
-    </message>
-    <message>
-        <source>Copy fee</source>
-        <translation>Копировать комиссию</translation>
-    </message>
-    <message>
-        <source>Copy after fee</source>
-        <translation>Копировать после комиссии</translation>
-    </message>
-    <message>
-        <source>Copy bytes</source>
-        <translation>Копировать байты</translation>
-    </message>
-    <message>
-        <source>Copy dust</source>
-        <translation>Копировать пыль</translation>
-    </message>
-    <message>
-        <source>Copy change</source>
-        <translation>Копировать сдачу</translation>
-    </message>
-    <message>
-        <source>(%1 locked)</source>
-        <translation>(%1 заблокировано)</translation>
-    </message>
-    <message>
-        <source>yes</source>
-        <translation>да</translation>
-    </message>
-    <message>
-        <source>no</source>
-        <translation>нет</translation>
-    </message>
-    <message>
-        <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
-        <translation>Эта метка станет красной, если любой получатель получит сумму меньше, чем текущий порог пыли.</translation>
-    </message>
-    <message>
-        <source>Can vary +/- %1 satoshi(s) per input.</source>
-        <translation>Может отличаться на +/- %1 сатоши на вход.</translation>
-    </message>
-    <message>
         <source>(no label)</source>
         <translation>(нет метки)</translation>
     </message>
-    <message>
-        <source>change from %1 (%2)</source>
-        <translation>сдача с %1 (%2)</translation>
-    </message>
-    <message>
-        <source>(change)</source>
-        <translation>(сдача)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
@@ -760,82 +588,10 @@
 </context>
 <context>
     <name>FreespaceChecker</name>
-    <message>
-        <source>A new data directory will be created.</source>
-        <translation>Будет создан новый каталог данных.</translation>
-    </message>
-    <message>
-        <source>name</source>
-        <translation>имя</translation>
-    </message>
-    <message>
-        <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
-        <translation>Каталог уже существует. Добавьте %1, если вы хотите создать здесь новый каталог.</translation>
-    </message>
-    <message>
-        <source>Path already exists, and is not a directory.</source>
-        <translation>Путь уже существует и не является каталогом.</translation>
-    </message>
-    <message>
-        <source>Cannot create data directory here.</source>
-        <translation>Не удаётся создать здесь каталог данных.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>HelpMessageDialog</name>
-    <message>
-        <source>version</source>
-        <translation>версия</translation>
-    </message>
-    <message>
-        <source>(%1-bit)</source>
-        <translation>(%1-бит)</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>О %1</translation>
-    </message>
-    <message>
-        <source>Command-line options</source>
-        <translation>Параметры командной строки</translation>
-    </message>
-    <message>
-        <source>Usage:</source>
-        <translation>Использование:</translation>
-    </message>
-    <message>
-        <source>command-line options</source>
-        <translation>параметры командной строки</translation>
-    </message>
-    <message>
-        <source>UI Options:</source>
-        <translation>Настройки интерфейса:</translation>
-    </message>
-    <message>
-        <source>Choose data directory on startup (default: %u)</source>
-        <translation>Выбрать каталог данных при запуске (по умолчанию: %u)</translation>
-    </message>
-    <message>
-        <source>Set language, for example "de_DE" (default: system locale)</source>
-        <translation>Выберите язык, например "de_DE" (по умолчанию: как в системе)</translation>
-    </message>
-    <message>
-        <source>Start minimized</source>
-        <translation>Запускать свёрнутым</translation>
-    </message>
-    <message>
-        <source>Set SSL root certificates for payment request (default: -system-)</source>
-        <translation>Указать корневые SSL-сертификаты для запроса платежа (по умолчанию: -system-)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: %u)</source>
-        <translation>Показывать экран-заставку при запуске (по умолчанию: %u)</translation>
-    </message>
-    <message>
-        <source>Reset all settings changed in the GUI</source>
-        <translation>Сбросить все настройки, измененные в графическом интерфейсе</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>Intro</name>
     <message>
@@ -932,27 +688,7 @@
 </context>
 <context>
     <name>OpenURIDialog</name>
-    <message>
-        <source>Open URI</source>
-        <translation>Открыть URI</translation>
-    </message>
-    <message>
-        <source>Open payment request from URI or file</source>
-        <translation>Открыть запрос платежа из URI или файла</translation>
-    </message>
-    <message>
-        <source>URI:</source>
-        <translation>URI:</translation>
-    </message>
-    <message>
-        <source>Select payment request file</source>
-        <translation>Выбрать файл запроса платежа</translation>
-    </message>
-    <message>
-        <source>Select payment request file to open</source>
-        <translation>Выберите файл запроса платежа</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>OptionsDialog</name>
     <message>
@@ -1356,23 +1092,7 @@
 </context>
 <context>
     <name>PeerTableModel</name>
-    <message>
-        <source>User Agent</source>
-        <translation>Юзер-агент</translation>
-    </message>
-    <message>
-        <source>Node/Service</source>
-        <translation>Узел/сервис</translation>
-    </message>
-    <message>
-        <source>NodeId</source>
-        <translation>Id узла</translation>
-    </message>
-    <message>
-        <source>Ping</source>
-        <translation>Пинг</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>QObject</name>
     <message>
@@ -1446,341 +1166,13 @@
 </context>
 <context>
     <name>QObject::QObject</name>
-    <message>
-        <source>Error: Specified data directory "%1" does not exist.</source>
-        <translation>Ошибка: указанный каталог "%1" не существует.</translation>
-    </message>
-    <message>
-        <source>Error: Cannot parse configuration file: %1. Only use key=value syntax.</source>
-        <translation>Ошибка: не удалось разобрать конфигурационный файл: %1. Используйте синтаксис вида ключ=значение.</translation>
-    </message>
-    <message>
-        <source>Error: %1</source>
-        <translation>Ошибка: %1</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>QRImageWidget</name>
-    <message>
-        <source>&amp;Save Image...</source>
-        <translation>&amp;Сохранить изображение...</translation>
-    </message>
-    <message>
-        <source>&amp;Copy Image</source>
-        <translation>Копировать &amp;изображение</translation>
-    </message>
-    <message>
-        <source>Save QR Code</source>
-        <translation>Сохранить QR-код</translation>
-    </message>
-    <message>
-        <source>PNG Image (*.png)</source>
-        <translation>Изображение PNG (*.png)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>RPCConsole</name>
-    <message>
-        <source>N/A</source>
-        <translation>Н/Д</translation>
-    </message>
-    <message>
-        <source>Client version</source>
-        <translation>Версия клиента</translation>
-    </message>
-    <message>
-        <source>&amp;Information</source>
-        <translation>&amp;Информация</translation>
-    </message>
-    <message>
-        <source>Debug window</source>
-        <translation>Окно отладки</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation>Общие</translation>
-    </message>
-    <message>
-        <source>Using BerkeleyDB version</source>
-        <translation>Используется версия BerkeleyDB</translation>
-    </message>
-    <message>
-        <source>Datadir</source>
-        <translation>Каталог для данных</translation>
-    </message>
-    <message>
-        <source>Startup time</source>
-        <translation>Время запуска</translation>
-    </message>
-    <message>
-        <source>Network</source>
-        <translation>Сеть</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Number of connections</source>
-        <translation>Число подключений</translation>
-    </message>
-    <message>
-        <source>Block chain</source>
-        <translation>Цепь блоков</translation>
-    </message>
-    <message>
-        <source>Current number of blocks</source>
-        <translation>Текущее число блоков</translation>
-    </message>
-    <message>
-        <source>Memory Pool</source>
-        <translation>Пул памяти</translation>
-    </message>
-    <message>
-        <source>Current number of transactions</source>
-        <translation>Текущее число транзакций</translation>
-    </message>
-    <message>
-        <source>Memory usage</source>
-        <translation>Использование памяти</translation>
-    </message>
-    <message>
-        <source>Received</source>
-        <translation>Получено</translation>
-    </message>
-    <message>
-        <source>Sent</source>
-        <translation>Отправлено</translation>
-    </message>
-    <message>
-        <source>&amp;Peers</source>
-        <translation>&amp;Участники</translation>
-    </message>
-    <message>
-        <source>Banned peers</source>
-        <translation>Заблокированные участники</translation>
-    </message>
-    <message>
-        <source>Select a peer to view detailed information.</source>
-        <translation>Выберите участника для просмотра подробностей.</translation>
-    </message>
-    <message>
-        <source>Whitelisted</source>
-        <translation>Доверенный</translation>
-    </message>
-    <message>
-        <source>Direction</source>
-        <translation>Направление</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Версия</translation>
-    </message>
-    <message>
-        <source>Starting Block</source>
-        <translation>Начальный блок</translation>
-    </message>
-    <message>
-        <source>Synced Headers</source>
-        <translation>Синхронизировано заголовков</translation>
-    </message>
-    <message>
-        <source>Synced Blocks</source>
-        <translation>Синхронизировано блоков</translation>
-    </message>
-    <message>
-        <source>User Agent</source>
-        <translation>Юзер-агент</translation>
-    </message>
-    <message>
-        <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Открыть отладочный лог-файл %1 из текущего каталога данных. Это может занять несколько секунд для больших лог-файлов.</translation>
-    </message>
-    <message>
-        <source>Decrease font size</source>
-        <translation>Уменьшить размер текста</translation>
-    </message>
-    <message>
-        <source>Increase font size</source>
-        <translation>Увеличить размер текста</translation>
-    </message>
-    <message>
-        <source>Services</source>
-        <translation>Сервисы</translation>
-    </message>
-    <message>
-        <source>Ban Score</source>
-        <translation>Очков бана</translation>
-    </message>
-    <message>
-        <source>Connection Time</source>
-        <translation>Время соединения</translation>
-    </message>
-    <message>
-        <source>Last Send</source>
-        <translation>Последняя отправка</translation>
-    </message>
-    <message>
-        <source>Last Receive</source>
-        <translation>Последний раз получено</translation>
-    </message>
-    <message>
-        <source>Ping Time</source>
-        <translation>Время задержки</translation>
-    </message>
-    <message>
-        <source>The duration of a currently outstanding ping.</source>
-        <translation>Длительность текущего пинга.</translation>
-    </message>
-    <message>
-        <source>Ping Wait</source>
-        <translation>Время задержки</translation>
-    </message>
-    <message>
-        <source>Min Ping</source>
-        <translation>Мин. пинг</translation>
-    </message>
-    <message>
-        <source>Time Offset</source>
-        <translation>Смещение времени</translation>
-    </message>
-    <message>
-        <source>Last block time</source>
-        <translation>Время последнего блока</translation>
-    </message>
-    <message>
-        <source>&amp;Open</source>
-        <translation>&amp;Открыть</translation>
-    </message>
-    <message>
-        <source>&amp;Console</source>
-        <translation>Консоль</translation>
-    </message>
-    <message>
-        <source>&amp;Network Traffic</source>
-        <translation>Сетевой &amp;трафик</translation>
-    </message>
-    <message>
-        <source>&amp;Clear</source>
-        <translation>&amp;Очистить</translation>
-    </message>
-    <message>
-        <source>Totals</source>
-        <translation>Всего</translation>
-    </message>
-    <message>
-        <source>In:</source>
-        <translation>Вход:</translation>
-    </message>
-    <message>
-        <source>Out:</source>
-        <translation>Выход:</translation>
-    </message>
-    <message>
-        <source>Debug log file</source>
-        <translation>Отладочный лог-файл</translation>
-    </message>
-    <message>
-        <source>Clear console</source>
-        <translation>Очистить консоль</translation>
-    </message>
-    <message>
-        <source>1 &amp;hour</source>
-        <translation>1 &amp;час</translation>
-    </message>
-    <message>
-        <source>1 &amp;day</source>
-        <translation>1 &amp;день</translation>
-    </message>
-    <message>
-        <source>1 &amp;week</source>
-        <translation>1 &amp;неделю</translation>
-    </message>
-    <message>
-        <source>1 &amp;year</source>
-        <translation>1 &amp;год</translation>
-    </message>
-    <message>
-        <source>&amp;Disconnect</source>
-        <translation>&amp;Отключиться</translation>
-    </message>
-    <message>
-        <source>Ban for</source>
-        <translation>Бан на</translation>
-    </message>
-    <message>
-        <source>&amp;Unban</source>
-        <translation>&amp;Разбанить</translation>
-    </message>
-    <message>
-        <source>Welcome to the %1 RPC console.</source>
-        <translation>Добро пожаловать в консоль RPC %1.</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Используйте стрелки вверх и вниз для просмотра истории и &lt;b&gt;Ctrl-L&lt;/b&gt; для очистки экрана.</translation>
-    </message>
-    <message>
-        <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
-        <translation>Напишите &lt;b&gt;help&lt;/b&gt; для просмотра доступных команд.</translation>
-    </message>
-    <message>
-        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramification of a command.</source>
-        <translation>ВНИМАНИЕ: мошенники предлагали пользователям вводить сюда команды, похищая таким образом содержимое их бумажников. Не используйте эту консоль без полного понимания смысла команд.</translation>
-    </message>
-    <message>
-        <source>Network activity disabled</source>
-        <translation>Сетевая активность запрещена</translation>
-    </message>
-    <message>
-        <source>%1 B</source>
-        <translation>%1 Б</translation>
-    </message>
-    <message>
-        <source>%1 KB</source>
-        <translation>%1 КБ</translation>
-    </message>
-    <message>
-        <source>%1 MB</source>
-        <translation>%1 МБ</translation>
-    </message>
-    <message>
-        <source>%1 GB</source>
-        <translation>%1 ГБ</translation>
-    </message>
-    <message>
-        <source>(node id: %1)</source>
-        <translation>(номер узла: %1)</translation>
-    </message>
-    <message>
-        <source>via %1</source>
-        <translation>через %1</translation>
-    </message>
-    <message>
-        <source>never</source>
-        <translation>никогда</translation>
-    </message>
-    <message>
-        <source>Inbound</source>
-        <translation>Входящие</translation>
-    </message>
-    <message>
-        <source>Outbound</source>
-        <translation>Исходящие</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation>Да</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation>Нет</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Неизвестно</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
@@ -1871,89 +1263,25 @@
 <context>
     <name>ReceiveRequestDialog</name>
     <message>
-        <source>QR Code</source>
-        <translation>QR код</translation>
-    </message>
-    <message>
-        <source>Copy &amp;URI</source>
-        <translation>Копировать &amp;URI</translation>
-    </message>
-    <message>
-        <source>Copy &amp;Address</source>
-        <translation>Копировать &amp;адрес</translation>
-    </message>
-    <message>
-        <source>&amp;Save Image...</source>
-        <translation>&amp;Сохранить изображение...</translation>
-    </message>
-    <message>
-        <source>Request payment to %1</source>
-        <translation>Запросить платёж на %1</translation>
-    </message>
-    <message>
-        <source>Payment information</source>
-        <translation>Информация платежа</translation>
-    </message>
-    <message>
-        <source>URI</source>
-        <translation>URI</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Адрес</translation>
     </message>
     <message>
-        <source>Amount</source>
-        <translation>Сумма</translation>
-    </message>
-    <message>
         <source>Label</source>
         <translation>Метка</translation>
     </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation>Получившийся URI слишком длинный, попробуйте сократить текст метки / сообщения.</translation>
-    </message>
-    <message>
-        <source>Error encoding URI into QR Code.</source>
-        <translation>Ошибка кодирования URI в QR-код</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
         <source>Label</source>
         <translation>Метка</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
     </message>
     <message>
         <source>(no label)</source>
         <translation>(нет метки)</translation>
     </message>
-    <message>
-        <source>(no message)</source>
-        <translation>(нет сообщения)</translation>
-    </message>
-    <message>
-        <source>(no amount requested)</source>
-        <translation>(нет запрошенной суммы)</translation>
-    </message>
-    <message>
-        <source>Requested</source>
-        <translation>Запрошено</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
@@ -2306,22 +1634,10 @@
 </context>
 <context>
     <name>SendConfirmationDialog</name>
-    <message>
-        <source>Yes</source>
-        <translation>Да</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ShutdownWindow</name>
-    <message>
-        <source>%1 is shutting down...</source>
-        <translation>%1 выключается...</translation>
-    </message>
-    <message>
-        <source>Do not shut down the computer until this window disappears.</source>
-        <translation>Не выключайте компьютер, пока это окно не исчезнет.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
@@ -2463,436 +1779,32 @@
 </context>
 <context>
     <name>SplashScreen</name>
-    <message>
-        <source>[testnet]</source>
-        <translation>[тестовая сеть]</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TrafficGraphWidget</name>
-    <message>
-        <source>KB/s</source>
-        <translation>КБ/сек</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionDesc</name>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Открыто для ещё %n блока</numerusform><numerusform>Открыто для ещё %n блоков</numerusform><numerusform>Открыто для ещё %n блоков</numerusform><numerusform>Открыто для ещё %n блоков</numerusform></translation>
-    </message>
-    <message>
-        <source>Open until %1</source>
-        <translation>Открыто до %1</translation>
-    </message>
-    <message>
-        <source>conflicted with a transaction with %1 confirmations</source>
-        <translation>конфликт с транзакцией с %1 подтверждений</translation>
-    </message>
-    <message>
-        <source>%1/offline</source>
-        <translation>%1/отключен</translation>
-    </message>
-    <message>
-        <source>0/unconfirmed, %1</source>
-        <translation>0/не подтверждено, %1</translation>
-    </message>
-    <message>
-        <source>in memory pool</source>
-        <translation>В памяти</translation>
-    </message>
-    <message>
-        <source>not in memory pool</source>
-        <translation>Не в памяти</translation>
-    </message>
-    <message>
-        <source>abandoned</source>
-        <translation>заброшено</translation>
-    </message>
-    <message>
-        <source>%1/unconfirmed</source>
-        <translation>%1/не подтверждено</translation>
-    </message>
-    <message>
-        <source>%1 confirmations</source>
-        <translation>%1 подтверждений</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Статус</translation>
-    </message>
-    <message>
-        <source>, has not been successfully broadcast yet</source>
-        <translation>, ещё не было успешно разослано</translation>
-    </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, разослано через %n узел</numerusform><numerusform>, разослано через %n узла</numerusform><numerusform>, разослано через %n узлов</numerusform><numerusform>, разослано через %n узлов</numerusform></translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation>Источник</translation>
-    </message>
-    <message>
-        <source>Generated</source>
-        <translation>Сгенерированно</translation>
-    </message>
-    <message>
-        <source>From</source>
-        <translation>От</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>неизвестно</translation>
-    </message>
-    <message>
-        <source>To</source>
-        <translation>Для</translation>
-    </message>
-    <message>
-        <source>own address</source>
-        <translation>свой адрес</translation>
-    </message>
-    <message>
-        <source>watch-only</source>
-        <translation>только наблюдение</translation>
-    </message>
-    <message>
-        <source>label</source>
-        <translation>метка</translation>
-    </message>
-    <message>
-        <source>Credit</source>
-        <translation>Кредит</translation>
-    </message>
-    <message numerus="yes">
-        <source>matures in %n more block(s)</source>
-        <translation><numerusform>будет доступно через %n блок</numerusform><numerusform>будет доступно через %n блока</numerusform><numerusform>будет доступно через %n блоков</numerusform><numerusform>будет доступно через %n блоков</numerusform></translation>
-    </message>
-    <message>
-        <source>not accepted</source>
-        <translation>не принято</translation>
-    </message>
-    <message>
-        <source>Debit</source>
-        <translation>Дебет</translation>
-    </message>
-    <message>
-        <source>Total debit</source>
-        <translation>Всего дебет</translation>
-    </message>
-    <message>
-        <source>Total credit</source>
-        <translation>Всего кредит</translation>
-    </message>
-    <message>
-        <source>Transaction fee</source>
-        <translation>Комиссия</translation>
-    </message>
-    <message>
-        <source>Net amount</source>
-        <translation>Чистая сумма</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Comment</source>
-        <translation>Комментарий</translation>
-    </message>
-    <message>
-        <source>Transaction ID</source>
-        <translation>ID транзакции</translation>
-    </message>
-    <message>
-        <source>Transaction total size</source>
-        <translation>Общий размер транзакции</translation>
-    </message>
-    <message>
-        <source>Output index</source>
-        <translation>Номер выхода</translation>
-    </message>
-    <message>
-        <source>Merchant</source>
-        <translation>Продавец</translation>
-    </message>
-    <message>
-        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>Сгенерированные монеты должны подождать %1 блоков, прежде чем они могут быть потрачены. Когда вы сгенерировали этот блок, он был отправлен в сеть для добавления в цепочку блоков. Если он не попадёт в цепь, его статус изменится на "не принят", и монеты будут недействительны. Это иногда происходит в случае, если другой узел сгенерирует блок на несколько секунд раньше вас.</translation>
-    </message>
-    <message>
-        <source>Debug information</source>
-        <translation>Отладочная информация</translation>
-    </message>
-    <message>
-        <source>Transaction</source>
-        <translation>Транзакция</translation>
-    </message>
-    <message>
-        <source>Inputs</source>
-        <translation>Входы</translation>
-    </message>
-    <message>
-        <source>Amount</source>
-        <translation>Сумма</translation>
-    </message>
-    <message>
-        <source>true</source>
-        <translation>истина</translation>
-    </message>
-    <message>
-        <source>false</source>
-        <translation>ложь</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionDescDialog</name>
-    <message>
-        <source>This pane shows a detailed description of the transaction</source>
-        <translation>Эта панель отображает детальное описание транзакции.</translation>
-    </message>
-    <message>
-        <source>Details for %1</source>
-        <translation>Подробности %1</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionTableModel</name>
     <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
         <source>Label</source>
         <translation>Метка</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Открыто для ещё %n блока</numerusform><numerusform>Открыто для ещё %n блоков</numerusform><numerusform>Открыто для ещё %n блоков</numerusform><numerusform>Открыто для ещё %n блоков</numerusform></translation>
-    </message>
-    <message>
-        <source>Open until %1</source>
-        <translation>Открыто до %1</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Отключен</translation>
-    </message>
-    <message>
-        <source>Unconfirmed</source>
-        <translation>Не подтверждено</translation>
-    </message>
-    <message>
-        <source>Abandoned</source>
-        <translation>Заброшено</translation>
-    </message>
-    <message>
-        <source>Confirming (%1 of %2 recommended confirmations)</source>
-        <translation>Подтверждается (%1 из %2 рекомендуемых подтверждений)</translation>
-    </message>
-    <message>
-        <source>Confirmed (%1 confirmations)</source>
-        <translation>Подтверждено (%1 подтверждений)</translation>
-    </message>
-    <message>
-        <source>Conflicted</source>
-        <translation>В противоречии</translation>
-    </message>
-    <message>
-        <source>Immature (%1 confirmations, will be available after %2)</source>
-        <translation>Незрелый (%1 подтверждений, будет доступно после %2)</translation>
-    </message>
-    <message>
-        <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation>Этот блок не был получен другими узлами и, возможно, не будет принят!</translation>
-    </message>
-    <message>
-        <source>Generated but not accepted</source>
-        <translation>Сгенерировано, но не принято</translation>
-    </message>
-    <message>
-        <source>Received with</source>
-        <translation>Получено на</translation>
-    </message>
-    <message>
-        <source>Received from</source>
-        <translation>Получено от</translation>
-    </message>
-    <message>
-        <source>Sent to</source>
-        <translation>Отправлено на</translation>
-    </message>
-    <message>
-        <source>Payment to yourself</source>
-        <translation>Отправлено себе</translation>
-    </message>
-    <message>
-        <source>Mined</source>
-        <translation>Добыто</translation>
-    </message>
-    <message>
-        <source>watch-only</source>
-        <translation>только наблюдение</translation>
-    </message>
-    <message>
-        <source>(n/a)</source>
-        <translation>(недоступно)</translation>
     </message>
     <message>
         <source>(no label)</source>
         <translation>(нет метки)</translation>
     </message>
-    <message>
-        <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation>Статус транзакции. Подведите курсор к этому полю, чтобы увидеть количество подтверждений.</translation>
-    </message>
-    <message>
-        <source>Date and time that the transaction was received.</source>
-        <translation>Дата и время получения транзакции.</translation>
-    </message>
-    <message>
-        <source>Type of transaction.</source>
-        <translation>Тип транзакции.</translation>
-    </message>
-    <message>
-        <source>Whether or not a watch-only address is involved in this transaction.</source>
-        <translation>Использовался ли в транзакции адрес для наблюдения.</translation>
-    </message>
-    <message>
-        <source>User-defined intent/purpose of the transaction.</source>
-        <translation>Определяемое пользователем намерение/цель транзакции.</translation>
-    </message>
-    <message>
-        <source>Amount removed from or added to balance.</source>
-        <translation>Снятая или добавленная к балансу сумма.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionView</name>
     <message>
-        <source>All</source>
-        <translation>Все</translation>
-    </message>
-    <message>
-        <source>Today</source>
-        <translation>Сегодня</translation>
-    </message>
-    <message>
-        <source>This week</source>
-        <translation>На этой неделе</translation>
-    </message>
-    <message>
-        <source>This month</source>
-        <translation>В этом месяце</translation>
-    </message>
-    <message>
-        <source>Last month</source>
-        <translation>В прошлом месяце</translation>
-    </message>
-    <message>
-        <source>This year</source>
-        <translation>В этом году</translation>
-    </message>
-    <message>
-        <source>Range...</source>
-        <translation>Диапазон...</translation>
-    </message>
-    <message>
-        <source>Received with</source>
-        <translation>Получено на</translation>
-    </message>
-    <message>
-        <source>Sent to</source>
-        <translation>Отправлено на</translation>
-    </message>
-    <message>
-        <source>To yourself</source>
-        <translation>Себе</translation>
-    </message>
-    <message>
-        <source>Mined</source>
-        <translation>Добыто</translation>
-    </message>
-    <message>
-        <source>Other</source>
-        <translation>Другое</translation>
-    </message>
-    <message>
-        <source>Enter address or label to search</source>
-        <translation>Введите адрес или метку для поиска</translation>
-    </message>
-    <message>
-        <source>Min amount</source>
-        <translation>Мин. сумма</translation>
-    </message>
-    <message>
-        <source>Abandon transaction</source>
-        <translation>Отказаться от транзакции</translation>
-    </message>
-    <message>
-        <source>Copy address</source>
-        <translation>Копировать адрес</translation>
-    </message>
-    <message>
-        <source>Copy label</source>
-        <translation>Копировать метку</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Копировать сумму</translation>
-    </message>
-    <message>
-        <source>Copy transaction ID</source>
-        <translation>Копировать ID транзакции</translation>
-    </message>
-    <message>
-        <source>Copy raw transaction</source>
-        <translation>Копировать исходный код транзакции</translation>
-    </message>
-    <message>
-        <source>Copy full transaction details</source>
-        <translation>Копировать все подробности транзакции</translation>
-    </message>
-    <message>
-        <source>Edit label</source>
-        <translation>Изменить метку</translation>
-    </message>
-    <message>
-        <source>Show transaction details</source>
-        <translation>Показать подробности транзакции</translation>
-    </message>
-    <message>
-        <source>Export Transaction History</source>
-        <translation>Экспортировать историю транзакций</translation>
-    </message>
-    <message>
         <source>Comma separated file (*.csv)</source>
         <translation>Текст, разделённый запятыми (*.csv)</translation>
-    </message>
-    <message>
-        <source>Confirmed</source>
-        <translation>Подтверждено</translation>
-    </message>
-    <message>
-        <source>Watch-only</source>
-        <translation>Для наблюдения</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Тип</translation>
     </message>
     <message>
         <source>Label</source>
@@ -2903,55 +1815,19 @@
         <translation>Адрес</translation>
     </message>
     <message>
-        <source>ID</source>
-        <translation>ID</translation>
-    </message>
-    <message>
         <source>Exporting Failed</source>
         <translation>Экспорт не удался</translation>
     </message>
-    <message>
-        <source>There was an error trying to save the transaction history to %1.</source>
-        <translation>Произошла ошибка при сохранении истории транзакций в %1.</translation>
-    </message>
-    <message>
-        <source>Exporting Successful</source>
-        <translation>Экспорт успешно завершён</translation>
-    </message>
-    <message>
-        <source>The transaction history was successfully saved to %1.</source>
-        <translation>История транзакций была успешно сохранена в %1.</translation>
-    </message>
-    <message>
-        <source>Range:</source>
-        <translation>Диапазон:</translation>
-    </message>
-    <message>
-        <source>to</source>
-        <translation>до</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
-    <message>
-        <source>Unit to show amounts in. Click to select another unit.</source>
-        <translation>Единица измерения количества монет. Щёлкните для выбора другой единицы.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>WalletFrame</name>
-    <message>
-        <source>No wallet has been loaded.</source>
-        <translation>Не был загружен ни один бумажник.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>WalletModel</name>
-    <message>
-        <source>Send Coins</source>
-        <translation>Отправка</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>WalletView</name>
     <message>
@@ -2962,31 +1838,7 @@
         <source>Export the data in the current tab to a file</source>
         <translation>Экспортировать данные текущей вкладки в файл</translation>
     </message>
-    <message>
-        <source>Backup Wallet</source>
-        <translation>Резервная копия бумажника</translation>
-    </message>
-    <message>
-        <source>Wallet Data (*.dat)</source>
-        <translation>Данные бумажника (*.dat)</translation>
-    </message>
-    <message>
-        <source>Backup Failed</source>
-        <translation>Резервное копирование не удалось</translation>
-    </message>
-    <message>
-        <source>There was an error trying to save the wallet data to %1.</source>
-        <translation>Произошла ошибка при сохранении данных бумажника в %1.</translation>
-    </message>
-    <message>
-        <source>Backup Successful</source>
-        <translation>Резервное копирование успешно завершено</translation>
-    </message>
-    <message>
-        <source>The wallet data was successfully saved to %1.</source>
-        <translation>Данные бумажника были успешно сохранены в %1.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>bitcoin-core</name>
     <message>
@@ -3843,71 +2695,27 @@
     </message>
     <message>
         <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation>Бумажник постарается не платить меньше, чем минимальная комиссия передачи.</translation>
-    </message>
-    <message>
-        <source>This is the minimum transaction fee you pay on every transaction.</source>
-        <translation>Это минимальная комиссия, которую вы платите с каждой транзакцией.</translation>
-    </message>
-    <message>
-        <source>This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>Это комиссия, которую вы заплатите за эту транзакцию.</translation>
-    </message>
-    <message>
-        <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
-        <translation>Порог для отключения неправильно ведущих себя узлов (по умолчанию: %u)</translation>
+        <translation>Кошелёк постарается не платить меньше, чем минимальная комиссия передачи.</translation>
     </message>
     <message>
         <source>Transaction amounts must not be negative</source>
-        <translation>Сумма транзакции не должна быть негативной</translation>
-    </message>
-    <message>
-        <source>Transaction has too long of a mempool chain</source>
-        <translation>У транзакции слишком длинная цепочка в пуле в памяти.</translation>
-    </message>
-    <message>
-        <source>Transaction must have at least one recipient</source>
-        <translation>У транзакции должен быть как минимум один получатель</translation>
-    </message>
-    <message>
-        <source>Unknown network specified in -onlynet: '%s'</source>
-        <translation>В параметре -onlynet указана неизвестная сеть: '%s'</translation>
+        <translation>Сумма транзакции не должна быть отрицательной</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
-        <translation>Недостаточно монет</translation>
-    </message>
-    <message>
-        <source>Loading block index...</source>
-        <translation>Загрузка индекса блоков...</translation>
-    </message>
-    <message>
-        <source>Add a node to connect to and attempt to keep the connection open</source>
-        <translation>Добавить узел для подключения и пытаться поддерживать соединение открытым</translation>
+        <translation>Недостаточно средств</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation>Загрузка бумажника...</translation>
+        <translation>Загрузка электронного кошелька...</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
-        <translation>Не удаётся понизить версию бумажника</translation>
-    </message>
-    <message>
-        <source>Cannot write default address</source>
-        <translation>Не удаётся записать адрес по умолчанию</translation>
-    </message>
-    <message>
-        <source>Rescanning...</source>
-        <translation>Сканирование...</translation>
+        <translation>Не удаётся понизить версию электронного кошелька</translation>
     </message>
     <message>
         <source>Done loading</source>
         <translation>Загрузка завершена</translation>
     </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-</context>
+    </context>
 </TS>
