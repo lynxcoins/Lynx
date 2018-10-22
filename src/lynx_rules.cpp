@@ -12,12 +12,14 @@
 #include "lynx_rules.h"
 
 
-bool GetLynxHardForkParam(int cur_height, const std::vector<Consensus::HFLynxParams>& params, int& param)
+// best_block_height is a height of block before one we want to check
+bool GetLynxHardForkParam(int best_block_height, const std::vector<Consensus::HFLynxParams>& params, int& param)
 {
     param = 0; // set to default always
+    int block_height = best_block_height + 1; // height of block we want to check
     for (auto pair = params.rbegin(); pair != params.rend(); ++pair)
     {
-        if (cur_height > pair->height)
+        if (block_height >= pair->height)
         {
             param = pair->param;
             return true;
@@ -33,7 +35,8 @@ CAmount GetMinBalanceForMining(const CBlockIndex* pBestBlockIndex, const Consens
         return 0;
     else
     {
-        double difficulty = GetDifficultyPrevN(pBestBlockIndex, consensusParams.HardForkRule2DifficultyPrevBlockCount);
+        // - 1 because we already use previous block index which is "-1" itself
+        double difficulty = GetDifficultyPrevN(pBestBlockIndex, consensusParams.HardForkRule2DifficultyPrevBlockCount - 1);
         double minBalanceForMining = std::pow(difficulty, pow) * COIN;
         if (std::isinf(minBalanceForMining) || minBalanceForMining > consensusParams.HardForkRule2UpperLimitMinBalance)
             return consensusParams.HardForkRule2UpperLimitMinBalance;
@@ -72,7 +75,7 @@ const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmoun
 
     // rule2 prepare: find amount threshold
     CAmount minBalanceForMining = GetMinBalanceForMining(pBestBlockIndex, consensusParams);
-    
+
     // Find address
     auto it  = balances.begin();
     for (; it != balances.end(); ++it)
@@ -210,7 +213,8 @@ bool IsValidAddressForMining(const CTxDestination& address, CAmount balance, con
 bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
     int n_blocks = 0;
-    if (!GetLynxHardForkParam(pindex->nHeight, consensusParams.HardForkRule1params, n_blocks))
+    // "pindex->nHeight - 1" is a height of previous block (pbestblock)
+    if (!GetLynxHardForkParam(pindex->nHeight - 1, consensusParams.HardForkRule1params, n_blocks))
         return true; // The rule does not yet apply
     else
     {
@@ -241,7 +245,8 @@ bool CheckLynxRule1(const CBlock* pblock, const CBlockIndex* pindex, const Conse
 bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
     int pow = 0;
-    if (!GetLynxHardForkParam(pindex->nHeight, consensusParams.HardForkRule2params, pow))
+    // "pindex->nHeight - 1" is a height of previous block (pbestblock)
+    if (!GetLynxHardForkParam(pindex->nHeight - 1, consensusParams.HardForkRule2params, pow))
         return true; // The rule does not yet apply
     else
     {
@@ -275,7 +280,8 @@ bool CheckLynxRule2(const CBlock* pblock, const CBlockIndex* pindex, const Conse
 bool CheckLynxRule3(const CBlock* pblock, int nHeight, const Consensus::Params& consensusParams, bool from_builtin_miner /* = false */)
 {
     int n_chars = 0;
-    if (!GetLynxHardForkParam(nHeight, consensusParams.HardForkRule3params, n_chars))
+    // "nHeight - 1" is a height of previous block (pbestblock)
+    if (!GetLynxHardForkParam(nHeight - 1, consensusParams.HardForkRule3params, n_chars))
         return true; // The rule does not yet apply
     else
     {

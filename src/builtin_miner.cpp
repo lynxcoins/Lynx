@@ -169,6 +169,7 @@ namespace
             {
                 LogPrint(BCLog::MINER, "BuiltinMiner: Candidate block found, block hash %s\n", pblock->GetHash().ToString());
 
+                // nHeight is height of current best block, so nHeight + 1 will be height of new block
                 bool isValidRule3 = CheckLynxRule3(pblock, nHeight + 1, consensus, true);
                 if (isValidRule3)
                 {
@@ -199,7 +200,7 @@ namespace
         std::shared_ptr<CReserveScript> script;
         while (running)
         {
-            cpuLimiter->suspendMe();            
+            cpuLimiter->suspendMe();
             if (!getScriptForMining(script, nHeight))
             {
                 LogPrint(BCLog::MINER, "BuiltinMiner: Can't get appropriate address for mining. Sleeping for 30sec...\n");
