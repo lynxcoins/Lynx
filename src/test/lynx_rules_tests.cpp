@@ -34,7 +34,8 @@ static CBlockIndex* GetDifficultyBlockIndex()
 {
     const auto& consensusParams = Params().GetConsensus();
     CBlockIndex* difficultyBlockIndex = chainActive.Tip();
-    for (int i = 0; i < consensusParams.HardForkRule2DifficultyPrevBlockCount; ++i)
+    // -1 because chainActive.Tip() is already prevblock for new block
+    for (int i = 0; i < consensusParams.HardForkRule2DifficultyPrevBlockCount - 1; ++i)
         difficultyBlockIndex = difficultyBlockIndex->pprev;
     return difficultyBlockIndex;
 }
@@ -56,7 +57,7 @@ static std::string sha256(const CTxDestination& dest)
 
 BOOST_FIXTURE_TEST_SUITE(lynx_rules_tests, TestChain100Setup)
 
-BOOST_AUTO_TEST_CASE(lunx_rule1)
+BOOST_AUTO_TEST_CASE(lynx_rule1)
 {
     coinbaseKey2.MakeNewKey(true);
     coinbaseKey3.MakeNewKey(true);
@@ -180,8 +181,11 @@ BOOST_AUTO_TEST_CASE(lunx_rule1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(lunx_rule2)
+BOOST_AUTO_TEST_CASE(lynx_rule2)
 {
+    coinbaseKey2.MakeNewKey(true);
+    coinbaseKey3.MakeNewKey(true);
+
     const auto& consensusParams = Params().GetConsensus();
     const CTxDestination address = coinbaseKey.GetPubKey().GetID();
     const CTxDestination address2 = coinbaseKey2.GetPubKey().GetID();
@@ -257,8 +261,11 @@ BOOST_AUTO_TEST_CASE(lunx_rule2)
     }
 }
 
-BOOST_AUTO_TEST_CASE(lunx_rule3)
+BOOST_AUTO_TEST_CASE(lynx_rule3)
 {
+    coinbaseKey2.MakeNewKey(true);
+    coinbaseKey3.MakeNewKey(true);
+
     const auto& consensusParams = Params().GetConsensus();
     const CTxDestination address = coinbaseKey.GetPubKey().GetID();
     const CTxDestination address2 = coinbaseKey2.GetPubKey().GetID();
@@ -283,6 +290,7 @@ BOOST_AUTO_TEST_CASE(lunx_rule3)
     }
 
     // Let's check that the rule works
+    // loop until correct block is found
     while (!GetLynxHardForkParam(chainActive.Height() - 1, consensusParams.HardForkRule3params, n_chars))
     {
         std::map<CTxDestination, CAmount> balances = {
