@@ -304,16 +304,18 @@ UniValue importaddress(const JSONRPCRequest& request)
     {
         LOCK2(cs_main, pwallet->cs_wallet);
 
-    CBitcoinAddress address(request.params[0].get_str());
-    if (address.IsValid()) {
-        if (fP2SH)
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Cannot use the p2sh flag with an address - use a script instead");
-        ImportAddress(pwallet, address, strLabel);
-    } else if (IsHex(request.params[0].get_str())) {
-        std::vector<unsigned char> data(ParseHex(request.params[0].get_str()));
-        ImportScript(pwallet, CScript(data.begin(), data.end()), strLabel, fP2SH);
-    } else {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lynx address or script");
+        CTxDestination dest = DecodeDestination(request.params[0].get_str());
+        if (IsValidDestination(dest)) {
+            if (fP2SH) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Cannot use the p2sh flag with an address - use a script instead");
+            }
+            ImportAddress(pwallet, dest, strLabel);
+        } else if (IsHex(request.params[0].get_str())) {
+            std::vector<unsigned char> data(ParseHex(request.params[0].get_str()));
+            ImportScript(pwallet, CScript(data.begin(), data.end()), strLabel, fP2SH);
+        } else {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Litecoin address or script");
+        }
     }
     if (fRescan)
     {
@@ -645,11 +647,12 @@ UniValue dumpprivkey(const JSONRPCRequest& request)
     EnsureWalletIsUnlocked(pwallet);
 
     std::string strAddress = request.params[0].get_str();
-    CBitcoinAddress address;
-    if (!address.SetString(strAddress))
+    CTxDestination dest = DecodeDestination(strAddress);
+    if (!IsValidDestination(dest)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lynx address");
-    CKeyID keyID;
-    if (!address.GetKeyID(keyID))
+    }
+    auto keyid = GetKeyForDestination(*pwallet, dest);
+    if (keyid.IsNull()) {
         throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
     }
     CKey vchSecret;

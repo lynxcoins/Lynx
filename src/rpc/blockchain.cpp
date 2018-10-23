@@ -100,6 +100,11 @@ double GetDifficultyPrevN(const CBlockIndex* blockindex, int prevcount)
     return GetDifficulty(prev_pindex);
 }
 
+double GetDifficulty(const CBlockIndex* blockindex)
+{
+    return GetDifficulty(chainActive, blockindex);
+}
+
 UniValue blockheaderToJSON(const CBlockIndex* blockindex)
 {
     AssertLockHeld(cs_main);

@@ -433,6 +433,7 @@ Var vänlig och försök igen.</translation>
     <message>
         <source>Open a lynx: URI or payment request</source>
         <translation>Öppna en lynx: URI eller betalningsbegäran</translation>
+    </message>
     <message>
         <source>&amp;Command-line options</source>
         <translation>&amp;Kommandoradsalternativ</translation>
@@ -2116,6 +2117,7 @@ Var vänlig och försök igen.</translation>
         <source>total at least</source>
         <translation>totalt minst</translation>
     </message>
+    <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for lynx transactions than the network can process.</source>
         <translation>Att bara betala den minsta avgiften är helt ok så länge transaktionsvolymen är mindre än ledigt utrymme i blocken. Men tänk på att det kan bli en en transaktion som aldrig bekräftas om efterfrågan på lynx-transaktioner är större än vad nätverket kan hantera.</translation>
     </message>

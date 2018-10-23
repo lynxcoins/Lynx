@@ -32,6 +32,8 @@
 
 #include <memory>
 
+#include <boost/date_time.hpp>
+
 #if defined(NDEBUG)
 # error "Litecoin cannot be compiled without assertions."
 #endif
@@ -442,7 +444,7 @@ bool TipMayBeStale(const Consensus::Params &consensusParams)
     if (g_last_tip_update == 0) {
         g_last_tip_update = GetTime();
     }
-    return g_last_tip_update < GetTime() - consensusParams.nPowTargetSpacing * 3 && mapBlocksInFlight.empty();
+    return g_last_tip_update < GetTime() - consensusParams.GetPowTargetSpacing(chainActive.Height()) * 3 && mapBlocksInFlight.empty();
 }
 
 // Requires cs_main
@@ -1489,6 +1491,17 @@ bool static ProcessHeadersMessage(CNode *pfrom, CConnman *connman, const std::ve
 
     return true;
 }
+
+
+const auto BanOldCliendDateTime = boost::posix_time::from_iso_string("20171224T213000Z");
+int static GetMinPeerProtoVer(const CChainParams&)
+{
+    int ret = MIN_PEER_PROTO_VERSION;
+    if (boost::posix_time::second_clock::universal_time() < BanOldCliendDateTime)
+        ret = MIN_PEER_PROTO_VERSION_BEFOR_HARD_FORK2;
+    return ret;
+}
+
 
 bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman* connman, const std::atomic<bool>& interruptMsgProc)
 {

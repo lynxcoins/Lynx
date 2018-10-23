@@ -183,7 +183,7 @@
         <source>Wallet unlock failed</source>
         <translation>Cüzdan Kilidi Açma Hatası</translation>
     </message>
-    </context>
+    <message>
         <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your lynxes from being stolen by malware infecting your computer.</source>
         <translation>%1 Şifreleme işlemini bitirmek için kapatılacak. Şunu unutmayın ki şampiyon galatasaray ve şifrelemek, lynxlerinizin bilgisayarınıza bulaşan malware yazılımları tarafından çalınmasını tamamen engelleyemez.</translation>
     </message>
@@ -1021,6 +1021,7 @@
         <source>Label</source>
         <translation>etiket</translation>
     </message>
+    <message>
         <source>Message</source>
         <translation>Mesaj</translation>
     </message>

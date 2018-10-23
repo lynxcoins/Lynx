@@ -79,6 +79,7 @@ const CTxDestination* FindAddressForMining(const std::map<CTxDestination, CAmoun
     {
         const CTxDestination& addr = it->first;
         CAmount amount = it->second;
+        // FIXME: should use CTxDestination instead of CBitcoinAddress
         std::string strAddr = CBitcoinAddress(addr).ToString();
 
         if (addressesProhibitedForMining.count(strAddr) == 0 // rule1: check last blocks

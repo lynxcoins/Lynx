@@ -7,6 +7,8 @@
 #include <rpc/server.h>
 #include <wallet/db.h>
 
+CWallet *pwalletMain;
+
 WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     TestingSetup(chainName)
 {

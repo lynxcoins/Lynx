@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#include "amount.h"
+
 namespace Consensus {
 
 enum DeploymentPos

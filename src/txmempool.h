@@ -221,6 +221,22 @@ public:
         return f1 < f2;
     }
 
+    void GetModFeeAndSize(const CTxMemPoolEntry &a, double &mod_fee, double &size) const
+    {
+        // Compare feerate with ancestors to feerate of the transaction, and
+        // return the fee/size for the min.
+        double f1 = (double)a.GetModifiedFee() * a.GetSizeWithAncestors();
+        double f2 = (double)a.GetModFeesWithAncestors() * a.GetTxSize();
+
+        if (f1 > f2) {
+            mod_fee = a.GetModFeesWithAncestors();
+            size = a.GetSizeWithAncestors();
+        } else {
+            mod_fee = a.GetModifiedFee();
+            size = a.GetTxSize();
+        }
+    }
+
     // Calculate which score to use for an entry (avoiding division).
     bool UseDescendantScore(const CTxMemPoolEntry &a) const
     {

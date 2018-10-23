@@ -20,14 +20,13 @@ static const std::string strSecret1     ("6ovubWrWnw4o61TgbmcexN212aTZgE3y2e2jsf
 static const std::string strSecret2     ("6pvPJqDB19f1iX7LGj2izzY1UR7xmPPfAUNfwPTX2zttFEKznTK");
 static const std::string strSecret1C    ("Se8w9LmYVjdkR72mnTvNXMmR7xgFE8c6JESgEe1MVNGhN4WuX2j4");
 static const std::string strSecret2C    ("SiWdThnj9fCnAFtx4QWcNxws61Tj8uq1Sopes483ZpY1BMgvqEvr");
-static const CBitcoinAddress addr1 ("KLhGfjWMHoZusKCUuUZkYqUpetDS84iJwZ");
-static const CBitcoinAddress addr2 ("KT3VBZ6WHK4nC3fwuADGbEHzGyeo4J5i84");
-static const CBitcoinAddress addr1C("KB66BdCsgPUyHKvz4xJWbjR2Eb22U8ZmdC");
-static const CBitcoinAddress addr2C("K7UMQufE9YSRuMnbJc8tVy6KwXKACBm5mV");
+static const std::string addr1 ("KLhGfjWMHoZusKCUuUZkYqUpetDS84iJwZ");
+static const std::string addr2 ("KT3VBZ6WHK4nC3fwuADGbEHzGyeo4J5i84");
+static const std::string addr1C("KB66BdCsgPUyHKvz4xJWbjR2Eb22U8ZmdC");
+static const std::string addr2C("K7UMQufE9YSRuMnbJc8tVy6KwXKACBm5mV");
 
 static const std::string strAddressBad = "Lbi6bpMhSwp2CXkivEeUK9wzyQEFzHDfSr";
 
-static const std::string strAddressBad("Lbi6bpMhSwp2CXkivEeUK9wzyQEFzHDfSr");
 
 BOOST_FIXTURE_TEST_SUITE(key_tests, BasicTestingSetup)
 

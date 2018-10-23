@@ -168,20 +168,6 @@ BOOST_AUTO_TEST_CASE(base58_keys_valid_gen)
             std::string address = EncodeDestination(dest);
 
             BOOST_CHECK_EQUAL(address, exp_base58string);
-            }
-            }
-            else if(exp_addrType == "none")
-            {
-                dest = CNoDestination();
-            }
-            else
-            {
-                BOOST_ERROR("Bad addrtype: " << strTest);
-                continue;
-            }
-            CBitcoinAddress addrOut;
-            BOOST_CHECK_MESSAGE(addrOut.Set(dest, CChainParams::SCRIPT_ADDRESS), "encode dest: " + strTest);
-            BOOST_CHECK_MESSAGE(addrOut.ToString() == exp_base58string, "mismatch: " + strTest);
         }
     }
 
@@ -211,7 +197,7 @@ BOOST_AUTO_TEST_CASE(base58_keys_invalid)
             SelectParams(chain);
             destination = DecodeDestination(exp_base58string);
             BOOST_CHECK_MESSAGE(!IsValidDestination(destination), "IsValid pubkey in mainnet:" + strTest);
-        secret.SetString(exp_base58string);
+            secret.SetString(exp_base58string);
             BOOST_CHECK_MESSAGE(!secret.IsValid(), "IsValid privkey in mainnet:" + strTest);
         }
     }

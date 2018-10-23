@@ -186,7 +186,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     connect(watchOnlyWidget, SIGNAL(activated(int)), this, SLOT(chooseWatchonly(int)));
     connect(amountWidget, SIGNAL(textChanged(QString)), amount_typing_delay, SLOT(start()));
     connect(amount_typing_delay, SIGNAL(timeout()), this, SLOT(changedAmount()));
-    connect(addressWidget, SIGNAL(textChanged(QString)), prefix_typing_delay, SLOT(start()));
+    connect(search_widget, SIGNAL(textChanged(QString)), prefix_typing_delay, SLOT(start()));
     connect(prefix_typing_delay, SIGNAL(timeout()), this, SLOT(changedPrefix()));
 
     connect(view, SIGNAL(doubleClicked(QModelIndex)), this, SIGNAL(doubleClicked(QModelIndex)));
@@ -329,7 +329,7 @@ void TransactionView::changedPrefix()
 {
     if(!transactionProxyModel)
         return;
-    transactionProxyModel->setAddressPrefix(addressWidget->text());
+    transactionProxyModel->setSearchString(search_widget->text());
 }
 
 void TransactionView::changedAmount()

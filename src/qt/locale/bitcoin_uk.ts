@@ -400,6 +400,7 @@
     <message>
         <source>Verify messages to ensure they were signed with specified Lynx addresses</source>
         <translation>Перевірте повідомлення для впевненості, що воно підписано вказаною Lynx-адресою</translation>
+    </message>
     <message>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>

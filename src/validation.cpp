@@ -1889,9 +1889,7 @@ static ThresholdConditionCache warningcache[VERSIONBITS_NUM_BITS];
 static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consensus::Params& consensusparams) {
     AssertLockHeld(cs_main);
 
-    // BIP16 didn't become active until Oct 1 2012
-    int64_t nBIP16SwitchTime = 1349049600;
-    bool fStrictPayToScriptHash = (pindex->GetBlockTime() >= nBIP16SwitchTime);
+    unsigned int flags = SCRIPT_VERIFY_NONE;
 
     // Start enforcing P2SH (BIP16)
     if (pindex->nHeight >= consensusparams.BIP16Height) {
@@ -2153,15 +2151,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (!CheckLynxRules(&block, pindex, chainparams.GetConsensus(), state))
         return false;
 
-    // Write undo information to disk
-    if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS))
-    {
-        if (pindex->GetUndoPos().IsNull()) {
-            CDiskBlockPos _pos;
-            if (!FindUndoPos(state, pindex->nFile, _pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 40))
-                return error("ConnectBlock(): FindUndoPos failed");
-            if (!UndoWriteToDisk(blockundo, _pos, pindex->pprev->GetBlockHash(), chainparams.MessageStart()))
-                return AbortNode(state, "Failed to write undo data");
+    if (!WriteUndoDataForBlock(blockundo, state, pindex, chainparams))
+        return false;
 
     if (!pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
         pindex->RaiseValidity(BLOCK_VALID_SCRIPTS);
